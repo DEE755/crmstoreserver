@@ -17,16 +17,16 @@ public class EmployeeSerializer {
         return instance;
     }
 
-    public void saveEmployee(Employee employee, String filename) throws IOException, ClassNotFoundException {
+    public void saveEmployeeToLocalFile(Employee employee) throws IOException, ClassNotFoundException {
         List<Employee> employees;
         // Try to load existing employees, or create a new list if file doesn't exist
         try {
-            employees = loadEmployeeList(filename);
+            employees = loadEmployeeList();
         } catch (IOException | ClassNotFoundException e) {
             employees = new java.util.ArrayList<>();
         }
         employees.add(employee);
-        saveEmployeeList(employees , filename);
+        saveEmployeeList(employees , "employees.ser");
     }
 
     public Employee loadEmployee(int employee_id) throws IOException, ClassNotFoundException {
@@ -42,29 +42,37 @@ public class EmployeeSerializer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<Employee> loadEmployeeList(String filename) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+    public List<Employee> loadEmployeeList() throws IOException, ClassNotFoundException {
+        FileInputStream file = new FileInputStream("employees.ser");
+        try (ObjectInputStream in = new ObjectInputStream(file)) {
             return (List<Employee>) in.readObject();
         }
         catch (IOException | ClassNotFoundException e) {
             // If the file does not exist or is empty, return an empty list
-            System.err.println("There is no employee data available. Please add employees first.");
+            System.err.println("There is no employee data available. Please add employees first. File path: " + new java.io.File("employees.ser").getAbsolutePath());
             return new java.util.ArrayList<>();
         }
     }
 
 
-    public void sendEmployee(Employee employee, Socket clientSocket) {
-            ObjectOutputStream outputObject = null;
+    public void sendEmployeeToClient(Employee employee, Socket clientSocket) {
+        
+            System.out.println("Sending employee data...");
             try {
-                outputObject = new ObjectOutputStream(clientSocket.getOutputStream());
-                outputObject.writeObject(employee);
-                outputObject.flush();
-            } catch (IOException e) {
+               String employeeJson = String.format(
+            "{\"id\":%d,\"name\":\"%s\",\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"phoneNumber\":\"%s\"}",
+            employee.getId(), employee.getName(), employee.getUsername(), employee.getPassword(),
+            employee.getEmail(), employee.getPhoneNumber());
+            clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+            clientSocket.getOutputStream().flush();
+            clientSocket.getOutputStream().write((employeeJson + "\n").getBytes());
+            clientSocket.getOutputStream().flush();
+
+            System.out.println("Employee data sent successfully.");
+            } catch (Exception e) {
+                System.err.println("Error sending employee data: " + e.getMessage());
                 e.printStackTrace();
             }
-        finally {
-            if (outputObject != null) try { outputObject.close(); } catch (IOException ignored) {}
-        }
+        
     }
 }

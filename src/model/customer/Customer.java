@@ -4,7 +4,7 @@ import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
-import util.Utility;
+
 
 public abstract class Customer implements java.io.Serializable {
     @Serial
@@ -41,7 +41,7 @@ public abstract class Customer implements java.io.Serializable {
     public Customer(String fullname, String email, String phoneNumber, double discount) {
         this.fullname = fullname;
         this.email = email;
-        this.id = Utility.calculateLastId();
+        this.id = utils.Utility.calculateLastId();
         this.phoneNumber = phoneNumber;
         this.discount = discount;
     }

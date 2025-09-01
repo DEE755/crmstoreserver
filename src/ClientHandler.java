@@ -26,7 +26,7 @@ class ClientHandler implements Runnable {
             String line;
             while ((line = in.readLine()) != null) {
                 String response = handleCommand(line.trim());
-                // For multi-line responses, you can print several lines then "END"
+               
                 out.println(response);
                 if ("BYE".equals(response)) break;
             }
@@ -94,4 +94,4 @@ class ClientHandler implements Runnable {
     }
 }
 
-}
+

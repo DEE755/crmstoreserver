@@ -18,6 +18,15 @@ public class Employee implements java.io.Serializable {
         this.phoneNumber =phoneNumber; // Default phone number format
     }
 
+     public Employee(int id, String name, String email, String username, String password, String phoneNumber) {
+        this.name = name;
+        this.email = email; // Default email format
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.phoneNumber =phoneNumber; // Default phone number format
+    }
+
     public String getName() {
         return name;
     }

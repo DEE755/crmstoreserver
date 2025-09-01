@@ -6,6 +6,15 @@ public class Servers {
     private static ServerSocket serverSocket = null;
 
     public static void main(String[] args) throws IOException {
+
+        /*EmployeeSerializerTool employeeSerializerTool = new EmployeeSerializerTool();
+        
+        try {
+            employeeSerializerTool.saveEmployee(new Employee(0, "administrator", "admin@admin.com", "admin", "admin", "00000000"), "employees.ser");
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error saving employee: " + e.getMessage());
+        } */
+
         try {
             serverSocket = new ServerSocket(1234);
             System.out.println("Server is listening on port 1234...");
@@ -37,7 +46,7 @@ public class Servers {
             DataInputStream inputStream = null;
             PrintStream outputStream = null;
             String line = "";
-            Commands commands = new Commands();
+            Commands commands = new Commands(clientSocket);
 
             try {
                 inputStream = new DataInputStream(clientSocket.getInputStream());
@@ -48,9 +57,9 @@ public class Servers {
                 while (!"exit".equals(line)) {
                     line = inputStream.readLine();
                     if (line == null) break; // client closed
-                    outputStream.println("Echo: " + line);
+                    //outputStream.println("Echo: " + line);
                     System.out.println("[" + clientSocket.getPort() + "] Received: " + line);
-                    commands.handleCommand(line, clientSocket);
+                    commands.handleCommand(line);
                 }
 
             } catch (IOException e) {

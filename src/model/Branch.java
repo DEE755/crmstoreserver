@@ -1,3 +1,5 @@
+package model;
+
 public class Branch {
     private String name;
     private int id;

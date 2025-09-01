@@ -16,7 +16,7 @@ public class LoginHandler implements LoginHandlerInterface {
             if (employee.getUsername().equals(enteredUsername) && 
                 employee.getPassword().equals(enteredPassword)) {
                 loggedIn = true;
-                System.out.println("Login successful! Welcome " + employee.getName());
+                System.out.println("Employee Found: " + employee.getName());
                 return employee;
             }
         }
