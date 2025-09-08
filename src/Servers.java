@@ -1,19 +1,15 @@
 import java.io.*;
 import java.net.*;
+import utils.serializationtools.EmployeeSerializerTool;
 
 public class Servers {
-
     private static ServerSocket serverSocket = null;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-        /*EmployeeSerializerTool employeeSerializerTool = new EmployeeSerializerTool();
-        
-        try {
-            employeeSerializerTool.saveEmployee(new Employee(0, "administrator", "admin@admin.com", "admin", "admin", "00000000"), "employees.ser");
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error saving employee: " + e.getMessage());
-        } */
+        // Check if the employee file exists
+        EmployeeSerializerTool employeeSerializerTool = new EmployeeSerializerTool();
+        employeeSerializerTool.createFileIfNotExists();
 
         try {
             serverSocket = new ServerSocket(1234);
@@ -22,7 +18,7 @@ public class Servers {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected! from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
-                // hand off each client to its own thread
+                // each client gets its own thread
                 new Thread(new ClientHandler(clientSocket)).start();
             }
 

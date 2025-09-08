@@ -1,13 +1,14 @@
 package utils.serializationtools;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
-
 import model.Employee;
+import utils.Constants;
 
 public class EmployeeSerializerTool {
     
@@ -44,6 +45,21 @@ public class EmployeeSerializerTool {
             // If the file does not exist or is empty, return an empty list
             System.err.println("There is no employee data available. Please add employees first.");
             return new java.util.ArrayList<>();
+        }
+    }
+
+    public void createFileIfNotExists() {
+        File employeeFile = new File(Constants.EMPLOYEE_FILE);
+        if (!employeeFile.exists()) {
+            try {
+                EmployeeSerializerTool employeeSerializerTool = new EmployeeSerializerTool();
+                employeeSerializerTool.saveEmployee(
+                    new Employee(0, "administrator", "admin@admin.com", "admin", "admin", "00000000"),
+                    Constants.EMPLOYEE_FILE
+                );
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("Error saving employee: " + e.getMessage());
+            }
         }
     }
 }

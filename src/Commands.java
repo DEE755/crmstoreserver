@@ -2,7 +2,6 @@ import java.net.Socket;
 import login.LoginHandler;
 import model.Employee;
 import serialization.EmployeeSerializer;
-import utils.JSONObject;
 
 
 public class Commands {
@@ -40,7 +39,7 @@ private Socket clientSocket;
 
                     } else {
                         System.out.println("Login failed. Please check your credentials.");
-                        clientSocket.getOutputStream().write("Login failed".getBytes());
+                        clientSocket.getOutputStream().write("Login failed\n".getBytes());
                         clientSocket.getOutputStream().flush();
 
                     }
@@ -52,11 +51,16 @@ private Socket clientSocket;
                 }
 
             }
-            else if (command.contains("Add Employee")) {
+        }
+        else if (command.contains("AddEmployee")) {
+
+            String[] parts = command.split(" ");
+
+            if (parts.length == 7) {
                 try {
-                    String employeeinfo = clientSocket.getInputStream().toString();
-                    JSONObject jsonObject = new JSONObject(employeeinfo);
-                    Employee newEmployee = utils.TypeConverter.JSONToEmployee(jsonObject);
+
+                    //start reading after "AddEmployee+ 'space'"
+                    Employee newEmployee = utils.TypeConverter.stringToEmployee(command.substring(12)); 
                     
                     // Add the employee with the serializer
                     employeeSerializer.saveEmployeeToLocalFile(newEmployee);
@@ -68,8 +72,9 @@ private Socket clientSocket;
                 } catch (Exception ex) {
                     System.err.println("Error adding employee: " + ex.getMessage());
                 }
-                }
+                
             }
+        }
 
 
     }
