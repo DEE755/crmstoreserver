@@ -39,7 +39,7 @@ public class CustomerSerializer {
     }
 
     public void saveCustomerList(List<Customer> customers) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(util.Constants.CUSTOMER_DATA_FILE))) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(util.Constants.CUSTOMER_DATA_FILE ))) {
             out.writeObject(customers);
         }
     }

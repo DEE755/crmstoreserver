@@ -32,20 +32,13 @@ private Socket clientSocket;
 
     void handleCommand(String commandWithArgs) {
 
-        int firstSpace = commandWithArgs.indexOf(' ');
-        String firstWord, commandOnly;
-        if (firstSpace != -1) {
-            firstWord = commandWithArgs.substring(0, firstSpace);
-        } else {
-            firstWord = commandWithArgs; // No space found
-        }
-        commandOnly = firstWord;
+        String[] parts = commandWithArgs.split(" ");
+        String commandOnly = parts[0]; // Extract the first word
 
        switch (commandOnly) {
             case "Login":
         {
             
-            String[] parts = commandWithArgs.split(" ");
             if (parts.length == 3) {
                 try {
                     String username = parts[1];
@@ -75,8 +68,6 @@ private Socket clientSocket;
             }
         }
         case "AddEmployee": {
-
-            String[] parts = commandWithArgs.split(" ");
 
             if (parts.length == 7) {
                 try {
@@ -124,12 +115,33 @@ private Socket clientSocket;
 
 
         case "ListCustomers": {
+
+            if (parts.length > 2 && parts[1].equals("DELETEMODE")) {
+                try {
+
+                    //take the id after "DeleteCustomer "
+                    int customerId = Integer.parseInt(parts[2]);
+
+                    // Delete the customer with the serializer
+                    customerSerializer.deleteCustomer(customerId);
+                    System.out.println("Customer deleted: " + customerId);
+
+                    // Send a confirmation to the client
+                    clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+                    clientSocket.getOutputStream().flush();
+                } catch (Exception ex) {
+                    System.err.println("Error deleting customer: " + ex.getMessage());
+                }
+
+            }
+
             try {
                 System.out.println("Listing customers...");
                 // Load the customer list
                 List<Customer> customers = customerSerializer.loadCustomerList();
 
                 if (customers.isEmpty()) {
+                    clientSocket.getOutputStream().flush();
                     System.out.println("No customers found.");
                     clientSocket.getOutputStream().write("EMPTY\n".getBytes());
                     clientSocket.getOutputStream().flush();
@@ -141,22 +153,24 @@ private Socket clientSocket;
                 System.out.println("Customers:\n" + customersText);
 
                 // Send to client
-                String response = "SUCCESS\n" + customersText + "\n" + "ENDLIST\n";
+                String response = "SUCCESS\n" + customersText + "ENDLIST\n";
                 clientSocket.getOutputStream().write(response.getBytes());
                 clientSocket.getOutputStream().flush();
 
             } catch (Exception ex) {
                 System.err.println("Error listing customers: " + ex.getMessage());
             }
+
+            
             break;
         }
 
 
         case "AddCustomer": {
 
-            String[] parts = commandWithArgs.split(" ");
+            parts = commandWithArgs.split(" ");
 
-            if (parts.length == 7) {
+            if (parts.length == 8) {
                 try {
 
                     //start reading after "AddCustomer+ 'space'"
@@ -174,11 +188,8 @@ private Socket clientSocket;
                 }
 
                 break;
-
             }
-        }
-
-        
+        }        
 
 
         default:
