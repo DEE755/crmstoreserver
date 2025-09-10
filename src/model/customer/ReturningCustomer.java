@@ -5,4 +5,8 @@ public class ReturningCustomer extends Customer {
         super(fullname, email, phoneNumber,
               customerTypeDiscountMap.get(CustomerType.RETURNING));
     }
+
+    public ReturningCustomer(int givenId, String fullname, String email, String phoneNumber, double discount) {
+        super(givenId, fullname, email, phoneNumber, discount);
+    }
 }

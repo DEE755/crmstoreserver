@@ -26,7 +26,7 @@ public class EmployeeSerializer {
             employees = new java.util.ArrayList<>();
         }
         employees.add(employee);
-        saveEmployeeList(employees , "employees.ser");
+        saveEmployeeList(employees);
     }
 
     public Employee loadEmployee(int employee_id) throws IOException, ClassNotFoundException {
@@ -35,22 +35,22 @@ public class EmployeeSerializer {
         }
     }
 
-    public void saveEmployeeList(List<Employee> employees, String filename) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+    public void saveEmployeeList(List<Employee> employees) throws IOException {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(util.Constants.EMPLOYEE_FILE))) {
             out.writeObject(employees);
         }
     }
     
     @SuppressWarnings("unchecked")
     public List<Employee> loadEmployeeList() throws IOException, ClassNotFoundException {
-        FileInputStream file = new FileInputStream(utils.Constants.EMPLOYEE_FILE);
+        FileInputStream file = new FileInputStream(util.Constants.EMPLOYEE_FILE);
         try (ObjectInputStream in = new ObjectInputStream(file)) {
-            System.out.println("Loading employee list from " + utils.Constants.EMPLOYEE_FILE);
+            System.out.println("Loading employee list from " + util.Constants.EMPLOYEE_FILE);
             return (List<Employee>) in.readObject();
         }
         catch (IOException | ClassNotFoundException e) {
             // If the file does not exist or is empty, return an empty list
-            System.err.println("There is no employee data available. Please add employees first. File path: " + new java.io.File(utils.Constants.EMPLOYEE_FILE).getAbsolutePath());
+            System.err.println("There is no employee data available. Please add employees first. File path: " + new java.io.File(util.Constants.EMPLOYEE_FILE).getAbsolutePath());
             return new java.util.ArrayList<>();
         }
     }
@@ -75,5 +75,18 @@ public class EmployeeSerializer {
                 e.printStackTrace();
             }
         
+    }
+
+
+      public void saveEmployee(Employee employee) throws IOException, ClassNotFoundException {
+        List<Employee> employees;
+        // Try to load existing employees, or create a new list if file doesn't exist
+        try {
+            employees = loadEmployeeList();
+        } catch (IOException | ClassNotFoundException e) {
+            employees = new java.util.ArrayList<>();
+        }
+        employees.add(employee);
+        saveEmployeeList(employees);
     }
 }

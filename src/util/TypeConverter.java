@@ -1,9 +1,13 @@
-package utils;
+package util;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.List;
 import model.Employee;
+import model.customer.Customer;
+import model.customer.NewCustomer;
+import model.customer.ReturningCustomer;
+import model.customer.VIPCustomer;
 
 public class TypeConverter {
 
@@ -77,7 +81,57 @@ public static String employeeListToText(List<Employee> employees) {
           .append(employee.getPassword()).append(" ")
           .append(employee.getEmail()).append(" ")
           .append(employee.getPhoneNumber()).append("\n");
+
     }
     return sb.toString();
 }
+
+
+
+
+public static String customerListToText(List<Customer> customers) {
+    StringBuilder sb = new StringBuilder();
+    for (Customer customer : customers) {
+        // Example: comma-separated values and newline for each customer (allow multiple readline() calls until empty)
+        sb.append(customer.getId()).append(" ")
+          .append(customer.getFullName()).append(" ")
+          .append(customer.getEmail()).append(" ")
+          .append(customer.getPhoneNumber()).append(" ")
+          .append(customer.getDiscount()).append(" ")
+          .append(customer.getClass().getSimpleName());
+    }
+
+    return sb.toString();
+}
+
+public static Customer stringToCustomer(String customerInfoString) {
+    Customer newCustomer=null;
+    String[] parts = customerInfoString.split(" ");
+    if (parts.length != 1 && parts.length != 6) {
+        throw new IllegalArgumentException("Invalid customer string: " + customerInfoString);
+    }
+    System.err.println("Parts length: " + parts.length);
+    int id = Integer.parseInt(parts[0]);
+    String name = parts[1];
+    String email = parts[2];
+    String phoneNumber = parts[3];
+    double discount = Double.parseDouble(parts[4]);
+
+    switch (parts[5]) {
+        case "NewCustomer":
+            newCustomer = new NewCustomer(id, name,email, phoneNumber, discount);
+            break;
+        case "ReturningCustomer":
+            newCustomer = new ReturningCustomer(id, name,email, phoneNumber, discount);
+            break;
+        case "VIPCustomer":
+            newCustomer = new VIPCustomer(id, name,email, phoneNumber, discount);
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown customer type: " + parts[5]);
+    }
+    return newCustomer;
+
+}
+
 }

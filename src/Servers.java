@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;
-import utils.serializationtools.EmployeeSerializerTool;
 
 public class Servers {
     private static ServerSocket serverSocket = null;
@@ -8,8 +7,7 @@ public class Servers {
     public static void main(String[] args) {
 
         // Check if the employee file exists
-        EmployeeSerializerTool employeeSerializerTool = new EmployeeSerializerTool();
-        employeeSerializerTool.createFileIfNotExists();
+        util.Utility.createFileIfNotExists();
 
         try {
             serverSocket = new ServerSocket(1234);

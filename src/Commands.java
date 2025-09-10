@@ -2,11 +2,15 @@ import java.net.Socket;
 import java.util.List;
 import login.LoginHandler;
 import model.Employee;
+import model.customer.Customer;
+import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
 
 
 public class Commands {
 private static EmployeeSerializer employeeSerializer = null;
+private static CustomerSerializer customerSerializer = null;
+
 private static LoginHandler loginHandler = null;
 private Socket clientSocket;
     public Commands(Socket clientSocket) {
@@ -15,18 +19,33 @@ private Socket clientSocket;
         this.clientSocket = clientSocket;
 
         //Singleton
-        if (employeeSerializer == null){
-            employeeSerializer = new EmployeeSerializer();
-        }
+            if (employeeSerializer == null){
+                employeeSerializer = new EmployeeSerializer();
+            }
+
+            if (customerSerializer == null) {
+                customerSerializer = new CustomerSerializer();
+            }
 
     }
 
 
-    void handleCommand(String command) {
-        if (command.contains("Login"))
+    void handleCommand(String commandWithArgs) {
+
+        int firstSpace = commandWithArgs.indexOf(' ');
+        String firstWord, commandOnly;
+        if (firstSpace != -1) {
+            firstWord = commandWithArgs.substring(0, firstSpace);
+        } else {
+            firstWord = commandWithArgs; // No space found
+        }
+        commandOnly = firstWord;
+
+       switch (commandOnly) {
+            case "Login":
         {
             
-            String[] parts = command.split(" ");
+            String[] parts = commandWithArgs.split(" ");
             if (parts.length == 3) {
                 try {
                     String username = parts[1];
@@ -51,17 +70,19 @@ private Socket clientSocket;
                     System.err.println("Error during login: " + ex.getMessage());
                 }
 
+                break;
+
             }
         }
-        else if (command.contains("AddEmployee")) {
+        case "AddEmployee": {
 
-            String[] parts = command.split(" ");
+            String[] parts = commandWithArgs.split(" ");
 
             if (parts.length == 7) {
                 try {
 
                     //start reading after "AddEmployee+ 'space'"
-                    Employee newEmployee = utils.TypeConverter.stringToEmployee(command.substring(12)); 
+                    Employee newEmployee = util.TypeConverter.stringToEmployee(commandWithArgs.substring(12)); 
                     
                     // Add the employee with the serializer
                     employeeSerializer.saveEmployeeToLocalFile(newEmployee);
@@ -73,18 +94,20 @@ private Socket clientSocket;
                 } catch (Exception ex) {
                     System.err.println("Error adding employee: " + ex.getMessage());
                 }
-                
+
+                break;
+
             }
         }
 
-        else if (command.contains("ListEmployees")) {
+        case "ListEmployees": {
             try {
                 System.out.println("Listing employees...");
                 // Load the employee list
                 List<Employee> employees = employeeSerializer.loadEmployeeList();
 
                 // Convert to text format
-                String employeesText = utils.TypeConverter.employeeListToText(employees);
+                String employeesText = util.TypeConverter.employeeListToText(employees);
 
                 System.out.println("Employees:\n" + employeesText);
 
@@ -96,16 +119,78 @@ private Socket clientSocket;
             } catch (Exception ex) {
                 System.err.println("Error listing employees: " + ex.getMessage());
             }
+            break;
         }
-        else {
+
+
+        case "ListCustomers": {
+            try {
+                System.out.println("Listing customers...");
+                // Load the customer list
+                List<Customer> customers = customerSerializer.loadCustomerList();
+
+                if (customers.isEmpty()) {
+                    System.out.println("No customers found.");
+                    clientSocket.getOutputStream().write("EMPTY\n".getBytes());
+                    clientSocket.getOutputStream().flush();
+                    break;
+                }
+                // Convert to text format
+                String customersText = util.TypeConverter.customerListToText(customers);
+
+                System.out.println("Customers:\n" + customersText);
+
+                // Send to client
+                String response = "SUCCESS\n" + customersText + "\n" + "ENDLIST\n";
+                clientSocket.getOutputStream().write(response.getBytes());
+                clientSocket.getOutputStream().flush();
+
+            } catch (Exception ex) {
+                System.err.println("Error listing customers: " + ex.getMessage());
+            }
+            break;
+        }
+
+
+        case "AddCustomer": {
+
+            String[] parts = commandWithArgs.split(" ");
+
+            if (parts.length == 7) {
+                try {
+
+                    //start reading after "AddCustomer+ 'space'"
+                    Customer customer = util.TypeConverter.stringToCustomer(commandWithArgs.substring(12));
+
+                    // Add the customer with the serializer
+                    customerSerializer.saveCustomer(customer);
+                    System.out.println("Customer added: " + customer);
+
+                    // Send a confirmation to the client
+                    clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+                    clientSocket.getOutputStream().flush();
+                } catch (Exception ex) {
+                    System.err.println("Error adding employee: " + ex.getMessage());
+                }
+
+                break;
+
+            }
+        }
+
+        
+
+
+        default:
             try {
                 clientSocket.getOutputStream().write("UNKNOWN COMMAND\n".getBytes());
                 clientSocket.getOutputStream().flush();
             } catch (Exception e) {
                 System.err.println("Error sending unknown command response: " + e.getMessage());
             }
+       
+
+
         }
-
-
     }
 }

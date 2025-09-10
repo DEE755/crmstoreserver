@@ -1,4 +1,4 @@
-package utils;
+package util;
 
 public class Constants {
     private Constants() {
@@ -6,9 +6,7 @@ public class Constants {
     }
 
     public static final String EMPLOYEE_FILE = "employees.ser";
+    public static final String CUSTOMER_DATA_FILE = "customers.ser";
 
-public static String getEmployeeFile() {
-    return EMPLOYEE_FILE;
-}
 
 }

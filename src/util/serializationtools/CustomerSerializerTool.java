@@ -1,4 +1,4 @@
-package utils.serializationtools;
+package util.serializationtools;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

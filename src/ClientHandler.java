@@ -42,7 +42,9 @@ class ClientHandler implements Runnable {
         }
     }
 
-    private String handleCommand(String cmd) {
+
+    //delete later as we did a better version in Commands.java but still need some elements of this one
+       private String handleCommand(String cmd) {
         if (cmd.isEmpty()) return "ERR EMPTY";
         String[] parts = cmd.split("\\s+");
         String op = parts[0].toUpperCase();
@@ -71,27 +73,26 @@ class ClientHandler implements Runnable {
                 // TODO: include real role/branch from repository
                 return "OK LOGGED_IN user=" + user + " role=SELLER branch=A";
 
-            case "LOGOUT":
-                if (currentUser != null) {
-                    sessions.remove(currentUser);
-                    currentUser = null;
-                    return "OK LOGGED_OUT";
-                }
-                return "ERR NOT_LOGGED_IN";
+        case "LOGOUT":
+            if (currentUser != null) {
+                sessions.remove(currentUser);
+                currentUser = null;
+                return "OK LOGGED_OUT";
+            }
+            return "ERR NOT_LOGGED_IN";
 
-            case "EXIT":
-                return "BYE";
-
-            default:
-                return "ERR UNKNOWN_CMD";
-        }
+        default:
+            return "ERR UNKNOWN_COMMAND";
     }
+}
 
-    // Stub for now — swap with repository-backed validation
-    private boolean isValidUser(String user, String pass) {
-        return ("admin".equals(user) && "admin123".equals(pass))
-            || ("alice".equals(user) && "pass".equals(pass));
-    }
+// Stub for now — swap with repository-backed validation
+private boolean isValidUser(String user, String pass) {
+    return ("admin".equals(user) && "admin123".equals(pass))
+        || ("alice".equals(user) && "pass".equals(pass));
+}
+
+
 }
 
 

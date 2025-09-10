@@ -3,8 +3,7 @@ package model.customer;
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
-
-
+import util.Utility;
 
 public abstract class Customer implements java.io.Serializable {
     @Serial
@@ -38,12 +37,24 @@ public abstract class Customer implements java.io.Serializable {
         NEW, RETURNING, VIP
     }
 
+    //those constuctors can be only used as super from subclasses (abstract class)
+    //creating a totally new customer
     public Customer(String fullname, String email, String phoneNumber, double discount) {
         this.fullname = fullname;
         this.email = email;
-        this.id = utils.Utility.calculateLastId();
+        this.id = Utility.calculateLastId();
         this.phoneNumber = phoneNumber;
         this.discount = discount;
+    }
+
+    //creating a customer from already existing 
+     public Customer(int givenId, String fullname, String email, String phoneNumber, double discount) {
+        this.fullname = fullname;
+        this.email = email;
+        this.id = givenId;
+        this.phoneNumber = phoneNumber;
+        this.discount = discount;
+
     }
 
     public double calculatePrice(double basePrice) {
@@ -58,7 +69,7 @@ public abstract class Customer implements java.io.Serializable {
         return id;
     }
 
-    public String getFullname() {
+    public String getFullName() {
         return fullname;
     }
 }
