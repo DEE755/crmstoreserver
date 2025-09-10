@@ -6,9 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.List;
 import model.Employee;
 import utils.Constants;
+import utils.JSONObject;
+import utils.TypeConverter;
 
 public class EmployeeSerializerTool {
     
@@ -37,9 +40,11 @@ public class EmployeeSerializerTool {
     }
     
     @SuppressWarnings("unchecked")
-    public List<Employee> loadEmployeeList(String filename) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
-            return (List<Employee>) in.readObject();
+    public List<Employee> loadEmployeeList(Socket socket) throws IOException, ClassNotFoundException {
+        try {
+            JSONObject json = TypeConverter.employeeToJSON(null)
+            socket.getOutputStream().write("Loading employee list...\n".getBytes());
+            socket.getOutputStream().flush();
         }
         catch (IOException | ClassNotFoundException e) {
             // If the file does not exist or is empty, return an empty list

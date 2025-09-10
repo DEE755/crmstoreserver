@@ -43,13 +43,14 @@ public class EmployeeSerializer {
     
     @SuppressWarnings("unchecked")
     public List<Employee> loadEmployeeList() throws IOException, ClassNotFoundException {
-        FileInputStream file = new FileInputStream("employees.ser");
+        FileInputStream file = new FileInputStream(utils.Constants.EMPLOYEE_FILE);
         try (ObjectInputStream in = new ObjectInputStream(file)) {
+            System.out.println("Loading employee list from " + utils.Constants.EMPLOYEE_FILE);
             return (List<Employee>) in.readObject();
         }
         catch (IOException | ClassNotFoundException e) {
             // If the file does not exist or is empty, return an empty list
-            System.err.println("There is no employee data available. Please add employees first. File path: " + new java.io.File("employees.ser").getAbsolutePath());
+            System.err.println("There is no employee data available. Please add employees first. File path: " + new java.io.File(utils.Constants.EMPLOYEE_FILE).getAbsolutePath());
             return new java.util.ArrayList<>();
         }
     }

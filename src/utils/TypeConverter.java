@@ -1,5 +1,8 @@
 package utils;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.List;
 import model.Employee;
 
 public class TypeConverter {
@@ -44,4 +47,37 @@ public static Employee stringToEmployee(String str) {
 
 }
 
+
+
+public static JSONObject textEmployeeFileToJSONObject() {
+    JSONObject jsonObject = new JSONObject();
+    try (BufferedReader reader = new BufferedReader(new FileReader("employees.ser"))) {
+        String line;
+        int index = 0;
+        while ((line = reader.readLine()) != null) {
+            Employee employee = stringToEmployee(line);
+            jsonObject.put(String.valueOf(employee.getId()), employeeToJSON(employee));
+            index++;
+        }
+    } catch (Exception e) {
+        System.err.println("Error converting text file to JSONObject: " + e.getMessage());
+    }
+    return jsonObject;
+}
+
+
+
+public static String employeeListToText(List<Employee> employees) {
+    StringBuilder sb = new StringBuilder();
+    for (Employee employee : employees) {
+        // Example: comma-separated values and newline for each employee (allow multiple readline() calls until empty)
+        sb.append(employee.getId()).append(" ")
+          .append(employee.getName()).append(" ")
+          .append(employee.getUsername()).append(" ")
+          .append(employee.getPassword()).append(" ")
+          .append(employee.getEmail()).append(" ")
+          .append(employee.getPhoneNumber()).append("\n");
+    }
+    return sb.toString();
+}
 }
