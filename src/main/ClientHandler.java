@@ -1,21 +1,32 @@
+package main;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
+import model.Branch;
 
 class ClientHandler implements Runnable {
     private final Socket socket;
     private final Map<String, Boolean> sessions;
     private String currentUser = null;
+    private Branch branch;
 
     ClientHandler(Socket socket, Map<String, Boolean> sessions) 
     {
         this.socket = socket;
         this.sessions = sessions;
+        this.branch = branch;
+    }
+
+     ClientHandler(Socket socket, Branch branch) 
+    {
+        this.socket = socket;
+        this.branch = branch;
     }
 
     @Override
     public void run() {
+        Servers.currentBranch.set(this.branch); // Set branch for this thread
         try (BufferedReader in = new BufferedReader(
                  new InputStreamReader(socket.getInputStream(), "UTF-8"));
              PrintWriter out = new PrintWriter(

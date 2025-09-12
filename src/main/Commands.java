@@ -1,3 +1,4 @@
+package main;
 import java.net.Socket;
 import java.util.List;
 import login.LoginHandler;
@@ -20,11 +21,11 @@ private Socket clientSocket;
 
         //Singleton
             if (employeeSerializer == null){
-                employeeSerializer = new EmployeeSerializer();
+                employeeSerializer = EmployeeSerializer.getInstance();
             }
 
             if (customerSerializer == null) {
-                customerSerializer = new CustomerSerializer();
+                customerSerializer = CustomerSerializer.getInstance();
             }
 
     }

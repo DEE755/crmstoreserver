@@ -23,29 +23,19 @@ public class TypeConverter {
     }
 
 
-public static JSONObject employeeToJSON(Employee employee) {
-    JSONObject json = new JSONObject();
-    json.put("id", employee.getId());
-    json.put("name", employee.getName());
-    json.put("username", employee.getUsername());
-    json.put("password", employee.getPassword());
-    json.put("email", employee.getEmail());
-    json.put("phoneNumber", employee.getPhoneNumber());
-    return json;
-}
-
-public static Employee stringToEmployee(String str) {
-    Employee newEmployee;
-    String[] parts = str.split(" ");
-
-    if (parts.length != 6) {
-        throw new IllegalArgumentException("Invalid employee string format");
+public static Employee stringToEmployee(String employeeString) {
+    String[] parts = employeeString.split(" ");
+    if (parts.length != 1 && parts.length != 6) {
+        throw new IllegalArgumentException("Invalid employee string: " + employeeString);
     }
-    else {
-        newEmployee= new Employee(Integer.parseInt(parts[0]), parts[1], parts[2], parts[3], parts[4], parts[5]);
-    }
-
-    return newEmployee;
+    System.err.println("Parts length: " + parts.length);
+    int id = Integer.parseInt(parts[0]);
+    String name = parts[1];
+    String password = parts[2];
+    String email = parts[3];
+    String username = parts[4];
+    String phoneNumber = parts[5];
+    return new Employee(id, name, email, username, password, phoneNumber);
 
 }
 
@@ -60,9 +50,9 @@ public static String employeeListToText(List<Employee> employees) {
         // Example: comma-separated values and newline for each employee (allow multiple readline() calls until empty)
         sb.append(employee.getId()).append(" ")
           .append(employee.getName()).append(" ")
-          .append(employee.getUsername()).append(" ")
           .append(employee.getPassword()).append(" ")
           .append(employee.getEmail()).append(" ")
+          .append(employee.getUsername()).append(" ")
           .append(employee.getPhoneNumber())
           .append("\n");
 

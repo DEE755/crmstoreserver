@@ -13,6 +13,7 @@ public class LoginHandler implements LoginHandlerInterface {
     
     {     
                 for (Employee employee : employees) {
+                    System.out.println("Checking employee: " + employee.getUsername() + " with password: " + employee.getPassword());
             if (employee.getUsername().equals(enteredUsername) && 
                 employee.getPassword().equals(enteredPassword)) {
                 loggedIn = true;

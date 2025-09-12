@@ -1,20 +1,31 @@
+package main;
+
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import model.Branch;
+import serialization.CustomerSerializer;
+import serialization.EmployeeSerializer;
 
 public class Servers {
     private static ServerSocket serverSocket = null;
 
-    public static void main(String[] args) {
+    public static List<Branch> connectedBranches = new ArrayList<Branch>();
 
-        // Check if the employee file exists
-        util.Utility.createFileIfNotExists();
+    public static final ThreadLocal<Branch> currentBranch = new ThreadLocal<>();
+
+    public static void main(String[] args) {
 
         try {
             serverSocket = new ServerSocket(1234);
             System.out.println("Server is listening on port 1234...");
 
             while (true) {
-                Socket clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();;//blocking next call until a client connects
+                //When a Client connects:
+
                 System.out.println("Client connected! from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
                 // each client gets its own thread
                 new Thread(new ClientHandler(clientSocket)).start();
@@ -30,6 +41,7 @@ public class Servers {
 
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
+        private Branch branch;
 
         ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -43,11 +55,31 @@ public class Servers {
             Commands commands = new Commands(clientSocket);
 
             try {
+                //initialize input and output streams for the specific client
                 inputStream = new DataInputStream(clientSocket.getInputStream());
                 outputStream = new PrintStream(clientSocket.getOutputStream());
 
                 outputStream.println("YOU ARE NOW CONNECTED");
+                line = inputStream.readLine();
 
+                System.out.println(line);
+
+                String[] parts= line.split(" ");
+                Branch newlyConnectedBranch = new Branch(parts[0], Integer.parseInt(parts[1]), true);
+                this.branch = newlyConnectedBranch; //assign branch to this client handler
+                Servers.currentBranch.set(this.branch);
+                Servers.connectedBranches.add(newlyConnectedBranch);
+                
+                //INITIALIZE SERIALIZERS FOR THE BRANCH
+                CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
+                EmployeeSerializer employeeSerializer = EmployeeSerializer.getInstance();
+
+                
+                //checking if branch has employees data in the server and creates admin employee if not
+                // Check if the employee file exists
+                 util.Utility.createEmployeeFileIfNotExists(newlyConnectedBranch);
+
+                //MAIN LOOP - keep listening for commands from the client
                 while (!"exit".equals(line)) {
                     line = inputStream.readLine();
                     if (line == null) break; // client closed
@@ -62,6 +94,7 @@ public class Servers {
                 if (outputStream != null) outputStream.close();
                 if (inputStream != null) try { inputStream.close(); } catch (IOException ignored) {}
                 if (clientSocket != null) try { clientSocket.close(); } catch (IOException ignored) {}
+                Servers.currentBranch.remove();
             }
         }
 

@@ -6,10 +6,50 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
+import main.Servers;
+import model.Branch;
 import model.customer.Customer;
 
-public class CustomerSerializer {
-    
+public class CustomerSerializer { 
+
+    private String customerDataFile;
+    private Branch branch;
+
+    private static final ThreadLocal<CustomerSerializer> instance =
+        ThreadLocal.withInitial(() -> {
+            Branch branch = Servers.currentBranch.get();
+            return new CustomerSerializer(branch);
+        });
+
+    // Call this method to get the instance for the current thread and linking late init branch
+    public static CustomerSerializer getInstance() {
+    CustomerSerializer serializer = instance.get();
+    Branch currentBranch = Servers.currentBranch.get();
+    //linking late init branch if not set yet
+    if (serializer.branch == null && currentBranch != null) {
+        serializer.branch = currentBranch;
+        serializer.setFilesPaths();
+    }
+    return serializer;
+}
+
+//According to present code, when calling this constructor branch is always null. Udpate it in getInstance after getting currentBranch from Servers
+    private CustomerSerializer(Branch branch) {
+        this.branch = branch;
+        setFilesPaths();
+    }
+
+
+    private void setFilesPaths() {
+       if (branch != null) {
+            this.customerDataFile = branch.getCustomerFilePath();
+            System.out.println("Current branch in CustomerSerializer: " + branch.getName());
+        } else {
+            this.customerDataFile = util.Constants.CUSTOMER_DATA_FILE;
+            System.out.println("No current branch set in CustomerSerializer.");
+        }
+    }
+
     public void saveCustomer(Customer customer) throws IOException, ClassNotFoundException {
         List<Customer> customers;
         // Try to load existing customers, or create a new list if file doesn't exist
@@ -39,14 +79,14 @@ public class CustomerSerializer {
     }
 
     public void saveCustomerList(List<Customer> customers) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(util.Constants.CUSTOMER_DATA_FILE ))) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(customerDataFile))) {
             out.writeObject(customers);
         }
     }
     
     @SuppressWarnings("unchecked")
     public List<Customer> loadCustomerList() throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(util.Constants.CUSTOMER_DATA_FILE))) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(customerDataFile))) {
             return (List<Customer>) in.readObject();
         }
         catch (IOException | ClassNotFoundException e) {
@@ -55,4 +95,6 @@ public class CustomerSerializer {
             return new java.util.ArrayList<>();
         }
     }
+
+    
 }

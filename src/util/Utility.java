@@ -3,6 +3,7 @@ package util;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import model.Branch;
 import model.Employee;
 import model.customer.Customer;
 import serialization.CustomerSerializer;
@@ -12,8 +13,8 @@ import serialization.EmployeeSerializer;
 
 public class Utility {
 
-private static CustomerSerializer customerSerializer = new CustomerSerializer();
-private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
+private static CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
+private static EmployeeSerializer employeeSerializer = EmployeeSerializer.getInstance();
 
     public static int calculateLastId() {
 
@@ -30,8 +31,8 @@ private static EmployeeSerializer employeeSerializer = new EmployeeSerializer();
     }
 
 
-     public static void createFileIfNotExists() {
-        File employeeFile = new File(Constants.EMPLOYEE_FILE);
+     public static void createEmployeeFileIfNotExists(Branch branch) {
+        File employeeFile = new File(branch.getEmployeeFilePath());
         if (!employeeFile.exists()) {
             try {
                 employeeSerializer.saveEmployee(

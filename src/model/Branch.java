@@ -1,24 +1,37 @@
 package model;
 
-import java.net.Socket;
-import java.util.List;
+import main.Servers;
 
 public class Branch {
     private String name;
     private int id;
     private boolean isConnected;
-    private static List<Socket> branchClients;
+    
+   // private static List<Socket> branchClients;
 
 
-    public Branch(String name, int id, boolean isConnected, Socket clientSocket) {
+  
+
+    public Branch(String name, int id, boolean isConnected) {
         this.name = name;
         this.id = id;
-        this.isConnected = isConnected;
+        this.setConnectionStatus(isConnected);
+    }
 
-        if (branchClients == null) {
-            branchClients = new java.util.ArrayList<>();
-        }
-        branchClients.add(clientSocket);
+    private void setConnectionStatus(boolean isConnected) {
+       if (isConnected) {
+           System.out.println("Branch " + name + " is now connected.");
+           Servers.connectedBranches.add(this);
+           this.isConnected = true;
+       } else {
+
+            if(!Servers.connectedBranches.contains(this)){return;}
+
+            Servers.connectedBranches.remove(this);
+            this.isConnected = false;
+           System.out.println("Branch " + name + " is now disconnected.");
+       }
+       System.out.println("Currently connected branches: " + Servers.connectedBranches.size());
     }
 
     public String getName() {
@@ -29,7 +42,25 @@ public class Branch {
         return isConnected;
     }
 
+    public void setConnected(boolean connectionStatus) {
+        this.isConnected = connectionStatus;
+    }
+
     public int getId() {
         return id;
     }
+
+    public static int generateIdFromName(String name) {
+    return Math.abs(name.hashCode());
+}
+
+    public String getEmployeeFilePath() {
+        return "employee" + "_" + getName() + "_" + getId() + ".ser";
+    }
+
+    public String getCustomerFilePath() {
+        return "customer" + "_" + getName() + "_" + getId() + ".ser";
+    }
+
+    
 }
