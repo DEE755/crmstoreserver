@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 import main.Servers;
 
-public class Branch {
+public class Branch implements Serializable{
     private String name;
     private int id;
     private boolean isConnected;
@@ -16,6 +17,12 @@ public class Branch {
         this.name = name;
         this.id = id;
         this.setConnectionStatus(isConnected);
+    }
+
+     public Branch(String name) {
+        this.name = name;
+        this.id = hashIdFromName(name);
+        this.isConnected = false;
     }
 
     private void setConnectionStatus(boolean isConnected) {
@@ -50,7 +57,7 @@ public class Branch {
         return id;
     }
 
-    public static int generateIdFromName(String name) {
+    public static int hashIdFromName(String name) {
     return Math.abs(name.hashCode());
 }
 

@@ -3,8 +3,9 @@ package util;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import model.Branch;
+import main.Servers;
 import model.Employee;
+import model.Employee.Role;
 import model.customer.Customer;
 import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
@@ -31,12 +32,11 @@ private static EmployeeSerializer employeeSerializer = EmployeeSerializer.getIns
     }
 
 
-     public static void createEmployeeFileIfNotExists(Branch branch) {
-        File employeeFile = new File(branch.getEmployeeFilePath());
+     public static void createEmployeeFileIfNotExists() {
+        File employeeFile = new File(Servers.currentBranch.get().getEmployeeFilePath());
         if (!employeeFile.exists()) {
             try {
-                employeeSerializer.saveEmployee(
-                    new Employee(0, "administrator", "admin@admin.com", "admin", "admin", "00000000")
+                employeeSerializer.saveEmployee( new Employee(0, "administrator", "administrator", "admin@admin.com", "admin", "admin", "00000000", Role.ADMIN, Servers.currentBranch.get())
                 );
 
             } catch (IOException | ClassNotFoundException e) {

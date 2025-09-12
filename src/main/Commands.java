@@ -47,8 +47,11 @@ private Socket clientSocket;
 
                     Employee employee = loginHandler.authenticate(username, password, employeeSerializer.loadEmployeeList());
                     if (employee != null) {
-                        System.out.println("Login successful! Welcome " + employee.getName());
+         
+                        System.out.println("Login successful! Welcome " + employee.getFirstName());
                         loginHandler.setLoggedIn(true);
+                        clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+                        clientSocket.getOutputStream().flush();
                         employeeSerializer.sendEmployeeToClient(employee, clientSocket);
 
                     } else {
@@ -70,7 +73,7 @@ private Socket clientSocket;
         }
         case "AddEmployee": {
 
-            if (parts.length == 7) {
+            if (parts.length == 10) {
                 try {
 
                     //start reading after "AddEmployee+ 'space'"
@@ -89,6 +92,14 @@ private Socket clientSocket;
 
                 break;
 
+            }
+            else {
+                try {
+                    clientSocket.getOutputStream().write("INVALID ARGUMENTS\n".getBytes());
+                    clientSocket.getOutputStream().flush();
+                } catch (Exception e) {
+                    System.err.println("Error sending invalid arguments response: " + e.getMessage());
+                }
             }
         }
 

@@ -64,9 +64,13 @@ public class EmployeeSerializer {
     }
 
     public Employee loadEmployee(int employee_id) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("employee_" + employee_id + ".ser"))) {
-            return (Employee) in.readObject();
+        List<Employee> employees = loadEmployeeList();
+        for (Employee emp : employees) {
+            if (emp.getId() == employee_id) {
+                return emp;
+            }
         }
+        throw new IOException("Employee with ID " + employee_id + " not found.");
     }
 
     public void saveEmployeeList(List<Employee> employees) throws IOException {
@@ -90,26 +94,30 @@ public class EmployeeSerializer {
     }
 
 
-    public void sendEmployeeToClient(Employee employee, Socket clientSocket) {
-        
+
+     public void sendEmployeeToClient(Employee employee, Socket clientSocket) {
+
             System.out.println("Sending employee data...");
             try {
-               String employeeJson = String.format(
-            "{\"id\":%d,\"name\":\"%s\",\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"phoneNumber\":\"%s\"}",
-            employee.getId(), employee.getName(), employee.getUsername(), employee.getPassword(),
-            employee.getEmail(), employee.getPhoneNumber());
-            clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
-            clientSocket.getOutputStream().flush();
-            clientSocket.getOutputStream().write((employeeJson + "\n").getBytes());
-            clientSocket.getOutputStream().flush();
-
-            System.out.println("Employee data sent successfully.");
-            } catch (Exception e) {
+                clientSocket.getOutputStream().write((employeeToString(employee) + "\n").getBytes());
+                clientSocket.getOutputStream().flush();
+            } catch (IOException e) {
                 System.err.println("Error sending employee data: " + e.getMessage());
-                e.printStackTrace();
             }
-        
     }
+
+    public static String employeeToString(Employee employee) {
+    String employeeString = employee.getId() + " " +
+                            employee.getFirstName() + " " +
+                            employee.getFamilyName() + " " +
+                            employee.getPassword() + " " +
+                            employee.getEmail() + " " +
+                            employee.getUsername() + " " +
+                            employee.getPhoneNumber() + " " +
+                            employee.getRole().name() + " " +
+                            employee.getBranch().getName();
+    return employeeString;
+}
 
 
       public void saveEmployee(Employee employee) throws IOException, ClassNotFoundException {

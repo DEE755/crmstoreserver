@@ -77,7 +77,7 @@ public class Servers {
                 
                 //checking if branch has employees data in the server and creates admin employee if not
                 // Check if the employee file exists
-                 util.Utility.createEmployeeFileIfNotExists(newlyConnectedBranch);
+                 util.Utility.createEmployeeFileIfNotExists();
 
                 //MAIN LOOP - keep listening for commands from the client
                 while (!"exit".equals(line)) {
