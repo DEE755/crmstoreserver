@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Branch;
+import model.inventory.StockItem;
 import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
+import serialization.StockItemSerializer;
 
 public class Servers {
     private static ServerSocket serverSocket = null;
@@ -17,6 +19,12 @@ public class Servers {
     public static final ThreadLocal<Branch> currentBranch = new ThreadLocal<>();
 
     public static void main(String[] args) {
+
+            //detect existing branches
+            Branch.detectExistingBranches();
+            // Start server socket
+            System.out.println("Starting server...");
+            //default port 1234
 
         try {
             serverSocket = new ServerSocket(1234);
@@ -73,6 +81,7 @@ public class Servers {
                 //INITIALIZE SERIALIZERS FOR THE BRANCH
                 CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
                 EmployeeSerializer employeeSerializer = EmployeeSerializer.getInstance();
+                StockItemSerializer stockItemSerializer = StockItemSerializer.getInstance();
 
                 
                 //checking if branch has employees data in the server and creates admin employee if not

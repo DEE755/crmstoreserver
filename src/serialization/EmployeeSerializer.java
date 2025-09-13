@@ -11,7 +11,7 @@ import main.Servers;
 import model.Branch;
 import model.Employee;
 
-public class EmployeeSerializer {
+public class EmployeeSerializer extends CustomSerializer {
     
     private Branch branch;
     private String employeeDataFile;
@@ -131,4 +131,16 @@ public class EmployeeSerializer {
         employees.add(employee);
         saveEmployeeList(employees);
     }
+
+      public void deleteEmployee(int employeeId) throws ClassNotFoundException {
+         try {
+           List<Employee> employees = loadEmployeeList();
+           employees.removeIf(e -> e.getId() == employeeId);
+           saveEmployeeList(employees);
+       } catch (IOException e) {
+           System.err.println("Error loading employee list: " + e.getMessage());
+       }
+
+        
+      }
 }

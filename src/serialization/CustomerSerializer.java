@@ -10,7 +10,7 @@ import main.Servers;
 import model.Branch;
 import model.customer.Customer;
 
-public class CustomerSerializer { 
+public class CustomerSerializer extends CustomSerializer { 
 
     private String customerDataFile;
     private Branch branch;

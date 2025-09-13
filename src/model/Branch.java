@@ -1,13 +1,15 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Set;
 import main.Servers;
 
 public class Branch implements Serializable{
     private String name;
     private int id;
     private boolean isConnected;
-    
+    private static Set<Branch> existingBranches = new java.util.HashSet<>();
+
    // private static List<Socket> branchClients;
 
 
@@ -17,12 +19,14 @@ public class Branch implements Serializable{
         this.name = name;
         this.id = id;
         this.setConnectionStatus(isConnected);
+        existingBranches.add(this);
     }
 
      public Branch(String name) {
         this.name = name;
         this.id = hashIdFromName(name);
         this.isConnected = false;
+        existingBranches.add(this);
     }
 
     private void setConnectionStatus(boolean isConnected) {
@@ -69,5 +73,38 @@ public class Branch implements Serializable{
         return "customer" + "_" + getName() + "_" + getId() + ".ser";
     }
 
+    public String getInventoryFilePath() {
+        return "inventory" + "_" + getName() + "_" + getId() + ".ser";
+    }
     
+
+    public static void detectExistingBranches() {
+        java.io.File srcDir = new java.io.File(".");
+        java.io.FilenameFilter filter = (dir, name) -> name.startsWith("employee_") && name.endsWith(".ser");
+        String[] files = srcDir.list(filter);
+
+        if (files != null) {
+            for (String fileName : files) {
+                // Format: employee_name_id.ser
+                String[] parts = fileName.substring(0, fileName.length() - 4).split("_");
+                if (parts.length == 3) {
+                    String branchName = parts[1];
+                    int branchId;
+                    try {
+                        branchId = Integer.parseInt(parts[2]);
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+                    
+                    Branch branch = new Branch(branchName, branchId, false);
+                    existingBranches.add(branch);
+                    System.out.println("Detected existing branch: Name=" + branchName + ", ID=" + branchId);
+                }
+            }
+        }
+    }
+
+    public String getStockItemFilePath() {
+        return "stockItems" + "_" + getName() + "_" + getId() + ".ser";
+    }
 }

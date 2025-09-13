@@ -7,8 +7,12 @@ import model.customer.Customer;
 import model.customer.NewCustomer;
 import model.customer.ReturningCustomer;
 import model.customer.VIPCustomer;
+import model.inventory.StockItem;
 
 public class TypeConverter {
+
+
+//STRING ->EMPLOYEES TYPECONVERTERS
 
 public static Employee stringToEmployee(String employeeString) {
     String[] parts = employeeString.split(" ");
@@ -27,9 +31,6 @@ public static Employee stringToEmployee(String employeeString) {
     Branch branch = new Branch(parts[8]);
     return new Employee(id, firstName, familyName, email, username, password, phoneNumber, role, branch);
     }
-
-
-
 
 
 
@@ -54,7 +55,7 @@ public static String employeeListToText(List<Employee> employees) {
 }
 
 
-
+//STRING -> CUSTOMERS TYPECONVERTERS
 
 public static String customerListToText(List<Customer> customers) {
     StringBuilder sb = new StringBuilder();
@@ -102,5 +103,43 @@ public static Customer stringToCustomer(String customerInfoString) {
     return newCustomer;
 
 }
+
+
+
+
+
+//STRING -> ITEMS TYPECONVERTERS
+
+public static StockItem stringToStockItem(String itemString) {
+    String[] parts = itemString.split(" ");
+    if (parts.length != 1 && parts.length != 5) {
+        throw new IllegalArgumentException("SERVERstringToStockItem Invalid item string: " + itemString);
+    }
+    String name = parts[0];
+    int quantity = Integer.parseInt(parts[1]);
+    double price = Double.parseDouble(parts[2]);
+    int id = Integer.parseInt(parts[3]);
+    StockItem.Category category = StockItem.Category.valueOf(parts[4]);
+
+    return new StockItem(name, id, quantity, price, category);
+}
+
+
+
+public static String stockItemListToText(List<StockItem> stockItems) {
+    StringBuilder sb = new StringBuilder();
+    for (StockItem item : stockItems) {
+        sb.append(item.getName()).append(" ")
+          .append(item.getQuantity()).append(" ")
+          .append(item.getPrice()).append(" ")
+          .append(item.getId()).append(" ")
+          .append(item.getCategory().toString()).append("\n");
+    }
+    return sb.toString();
+}
+
+
+
+
 
 }
