@@ -1,10 +1,10 @@
 package serialization;
 
-public class CustomSerializer {
+public class BranchSerializer {
 
-   
     
 
+    
 
     
 

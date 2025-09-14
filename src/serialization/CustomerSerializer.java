@@ -105,6 +105,5 @@ public class CustomerSerializer extends CustomSerializer {
             return new java.util.ArrayList<>();
         }
     }
-
     
 }

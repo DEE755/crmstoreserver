@@ -1,6 +1,7 @@
 package util;
 
 import java.util.List;
+import java.util.Set;
 import model.Branch;
 import model.Employee;
 import model.customer.Customer;
@@ -139,7 +140,29 @@ public static String stockItemListToText(List<StockItem> stockItems) {
 }
 
 
-
-
+//BRANCHE SET -> TEXT TYPECONVERTER
+public static String branchSetToText(Set<Branch> branches) {
+    StringBuilder sb = new StringBuilder();
+    for (Branch branch : branches) {
+        sb.append(branch.getName()).append(" ")
+          .append(branch.getId()).append(" ")
+          .append(branch.isConnected() ? "Connected" : "Disconnected").append(" ")
+          .append(branch.isConnected()? branch.getConnectedEmployee().getFullName() : "None")
+          .append("\n");
+    }
+    return sb.toString();
+}
+//TEXT -> BRANCH TYPECONVERTER
+public static Branch stringToBranch(String branchString) {
+ String[] parts = branchString.split(",");
+    if (parts.length != 4) {
+        throw new IllegalArgumentException("Invalid branch string format");
+    }
+    String name = parts[0].trim();
+    int id = Integer.parseInt(parts[1].trim());
+    boolean isConnected = Boolean.parseBoolean(parts[2].trim());
+    Employee currentEmployee = stringToEmployee(parts[3].trim());
+    return new Branch(name, id, isConnected, currentEmployee);
+}
 
 }

@@ -2,3 +2,92 @@ Sun Sep 14 01:28:09 IDT 2025:  Branch connected: MainBranch at port 63819
 Sun Sep 14 01:31:51 IDT 2025:  Branch connected: MainBranch at port 63966
 Sun Sep 14 01:34:08 IDT 2025:  Branch connected: MainBranch at port 63994
 Sun Sep 14 01:34:17 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 11:03:35 IDT 2025:  Branch connected: MainBranch at port 64369
+Sun Sep 14 11:03:41 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:04:30 IDT 2025:  Branch connected: MainBranch at port 64379
+Sun Sep 14 11:04:34 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:08:04 IDT 2025:  Branch connected: MainBranch at port 64411
+Sun Sep 14 11:08:09 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:32:42 IDT 2025:  Branch connected: MainBranch at port 64571
+Sun Sep 14 11:32:46 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:33:21 IDT 2025: MainBranch added Customer: Lior Smith (ID: 5) at branch MainBranch
+Sun Sep 14 11:33:38 IDT 2025: MainBranch deleted Customer ID: 5
+Sun Sep 14 11:36:08 IDT 2025:  Branch connected: MainBranch at port 64604
+Sun Sep 14 11:36:11 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:37:05 IDT 2025: MainBranch added Customer: Jane Levi (ID: 5) at branch MainBranch
+Sun Sep 14 11:37:23 IDT 2025: MainBranch added Customer: Ducon FDP (ID: 6) at branch MainBranch
+Sun Sep 14 11:37:29 IDT 2025: MainBranch deleted Customer ID: 6
+Sun Sep 14 11:39:22 IDT 2025:  Branch connected: MainBranch at port 64627
+Sun Sep 14 11:39:24 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:42:26 IDT 2025:  Branch connected: MainBranch at port 64663
+Sun Sep 14 11:42:37 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:43:04 IDT 2025: MainBranch added StockItem: Bluetooth-Speaker (ID: 67242)
+Sun Sep 14 11:43:45 IDT 2025: MainBranch StockItem ID 67242 quantity modified to 15
+Sun Sep 14 11:57:33 IDT 2025:  Branch connected: MainBranch at port 64958
+Sun Sep 14 11:57:37 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 11:58:35 IDT 2025: MainBranch StockItem ID 18971 quantity modified to 17
+Sun Sep 14 12:17:47 IDT 2025:  Branch connected: MainBranch at port 65309
+Sun Sep 14 12:17:55 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 12:19:22 IDT 2025: Added Employee: Shana Tova (ID: 1) at branch MainBranch
+Sun Sep 14 12:19:47 IDT 2025:  Branch connected: MainBranch at port 65328
+Sun Sep 14 12:20:12 IDT 2025: MainBranch: Shana Tova logged in.
+Sun Sep 14 12:21:28 IDT 2025: MainBranch added StockItem: Combat-Helicopter (ID: 60438)
+Sun Sep 14 12:22:06 IDT 2025:  Branch connected: MainBranch at port 65346
+Sun Sep 14 12:22:13 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 12:38:08 IDT 2025:  Branch connected: MainBranch at port 49240
+Sun Sep 14 12:38:17 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 12:39:53 IDT 2025: MainBranch added StockItem: Elegant-Red-Jeans (ID: 49040)
+Sun Sep 14 12:40:31 IDT 2025: MainBranch added StockItem: Biscuits (ID: 17723)
+Sun Sep 14 17:12:16 IDT 2025:  Branch connected: MainBranch at port 53062
+Sun Sep 14 17:12:30 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 17:14:29 IDT 2025:  Branch connected: MainBranch at port 53110
+Sun Sep 14 17:14:34 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 17:17:16 IDT 2025:  Branch connected: MainBranch at port 53144
+Sun Sep 14 17:17:19 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 17:19:19 IDT 2025:  Branch connected: MainBranch at port 53165
+Sun Sep 14 17:19:25 IDT 2025:  Branch connected: MainBranch at port 53172
+Sun Sep 14 17:19:28 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 17:22:17 IDT 2025:  Branch connected: MainBranch at port 53192
+Sun Sep 14 17:22:20 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 17:22:30 IDT 2025:  Branch connected: MainBranch at port 53196
+Sun Sep 14 17:22:45 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 17:25:54 IDT 2025:  Branch connected: MainBranch at port 53226
+Sun Sep 14 17:25:57 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 17:36:35 IDT 2025:  Branch connected: MainBranch at port 53317
+Sun Sep 14 17:36:40 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 17:42:08 IDT 2025:  Branch connected: MainBranch at port 53375
+Sun Sep 14 17:42:17 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 17:44:41 IDT 2025:  Branch connected: MainBranch at port 53416
+Sun Sep 14 17:44:49 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 17:47:42 IDT 2025:  Branch connected: MainBranch at port 53445
+Sun Sep 14 17:47:56 IDT 2025:  Branch connected: MainBranch at port 53449
+Sun Sep 14 17:48:03 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 17:48:31 IDT 2025:  Branch connected: MainBranch at port 53457
+Sun Sep 14 17:48:37 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 17:48:53 IDT 2025:  Branch connected: MainBranch at port 53468
+Sun Sep 14 17:49:02 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 17:52:52 IDT 2025:  Branch connected: MainBranch at port 53528
+Sun Sep 14 17:53:01 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 18:26:27 IDT 2025:  Branch connected: MainBranch at port 54010
+Sun Sep 14 18:26:43 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 18:27:44 IDT 2025:  Branch connected: MainBranch at port 54031
+Sun Sep 14 18:27:52 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 18:32:18 IDT 2025:  Branch connected: MainBranch at port 54084
+Sun Sep 14 18:32:21 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 18:45:49 IDT 2025:  Branch connected: MainBranch at port 54261
+Sun Sep 14 18:45:58 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 19:14:16 IDT 2025:  Branch connected: MainBranch at port 54727
+Sun Sep 14 19:14:24 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 19:17:00 IDT 2025:  Branch connected: MainBranch at port 54746
+Sun Sep 14 19:17:08 IDT 2025:  Branch connected: MainBranch at port 54751
+Sun Sep 14 19:17:12 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 19:19:11 IDT 2025:  Branch connected: MainBranch at port 54775
+Sun Sep 14 19:19:16 IDT 2025: MainBranch: David Cohen logged in.
+Sun Sep 14 19:19:44 IDT 2025: David-Cohen@MainBranch started chat session with MainBranch
+Sun Sep 14 19:23:08 IDT 2025:  Branch connected: MainBranch at port 54825
+Sun Sep 14 19:23:11 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 19:24:57 IDT 2025:  Branch connected: MainBranch at port 54847
+Sun Sep 14 19:25:06 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 19:26:38 IDT 2025:  Branch connected: MainBranch at port 54855
+Sun Sep 14 19:26:42 IDT 2025: MainBranch: administrator administrator logged in.
+Sun Sep 14 19:30:25 IDT 2025:  Branch connected: MainBranch at port 54887

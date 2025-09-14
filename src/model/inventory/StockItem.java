@@ -28,16 +28,13 @@ public class StockItem implements java.io.Serializable {
     }
 
     
-     public enum Category {
+    public enum Category {
         ELECTRONICS, CLOTHING, GROCERY, MISC
     }
-
    
-
     public String getName() {
         return name;
     }
-
 
     public int getQuantity() {
         return quantity;

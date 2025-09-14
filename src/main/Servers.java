@@ -3,11 +3,10 @@ package main;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 import model.Branch;
-import model.Employee;
-import model.inventory.StockItem;
 import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
 import serialization.Logger;
@@ -16,7 +15,8 @@ import serialization.StockItemSerializer;
 public class Servers {
     private static ServerSocket serverSocket = null;
 
-    public static List<Branch> connectedBranches = new ArrayList<Branch>();
+    public static Set<Branch> connectedBranches = new HashSet<>();
+    public static List<ClientHandler> clientHandlers = new ArrayList<>();
 
     public static final ThreadLocal<Branch> currentBranch = new ThreadLocal<>();
     private static Logger logger = Logger.getInstance();
@@ -50,12 +50,13 @@ public class Servers {
     }
 
 
-    private static class ClientHandler implements Runnable {
-        private final Socket clientSocket;
-        private Branch branch;
+    static class ClientHandler implements Runnable {
+        final Socket clientSocket;
+        Branch branch;
 
         ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
+            clientHandlers.add(this);
         }
 
         @Override
@@ -79,7 +80,9 @@ public class Servers {
                 Branch newlyConnectedBranch = new Branch(parts[0], Integer.parseInt(parts[1]), true);
                 this.branch = newlyConnectedBranch; //assign branch to this client handler
                 Servers.currentBranch.set(this.branch);
-                Servers.connectedBranches.add(newlyConnectedBranch);
+                System.out.println("Branch created and added: " + newlyConnectedBranch.getName() + " with ID " + newlyConnectedBranch.getId() + " connected: " + newlyConnectedBranch.isConnected());
+                Branch.addBranchAndUpdateConnectionNoDuplicates(newlyConnectedBranch);
+                commands.refreshAssociatedBranch(newlyConnectedBranch);
                 logger.log(" Branch connected: " + newlyConnectedBranch.getName() + " at port " + clientSocket.getPort());
 
                 

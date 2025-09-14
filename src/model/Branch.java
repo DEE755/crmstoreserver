@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 import main.Servers;
 
@@ -21,7 +22,7 @@ public class Branch implements Serializable{
         this.name = name;
         this.id = id;
         this.setConnectionStatus(isConnected);
-        existingBranches.add(this);
+        addBranchAndUpdateConnectionNoDuplicates(this);
     }
 
     public Branch(String name, int id, boolean isConnected, Employee connectedEmployee) {
@@ -29,14 +30,14 @@ public class Branch implements Serializable{
         this.id = id;
         this.setConnectionStatus(isConnected);
         this.connectedEmployee = connectedEmployee;
-        existingBranches.add(this);
+        addBranchAndUpdateConnectionNoDuplicates(this);
     }
 
      public Branch(String name) {
         this.name = name;
         this.id = hashIdFromName(name);
         this.isConnected = false;
-        existingBranches.add(this);
+        addBranchAndUpdateConnectionNoDuplicates(this);
     }
 
     
@@ -44,7 +45,8 @@ public class Branch implements Serializable{
     public void setConnectionStatus(boolean isConnected) {
        if (isConnected) {
            System.out.println("Branch " + name + " is now connected.");
-           Servers.connectedBranches.add(this);
+           addBranchAndUpdateConnectionNoDuplicates(this);
+
            this.isConnected = true;
        } else {
 
@@ -99,15 +101,18 @@ public class Branch implements Serializable{
     }
 
     public void setConnectedEmployee(Employee employee) {
-        if (!isConnected()) {
-            System.out.println("Cannot set connected employee. Branch " + name + " is not connected.");
+
+        if (!isConnected() || employee == null) {
+            System.out.println("Cannot set connected employee. Branch " + name + " is not connected or employee is null.");
             return;
         }
+        System.out.println("Setting connected employee for Branch " + name + " to " + employee.getFullName());
         this.connectedEmployee = employee;
+        addBranchAndUpdateConnectionNoDuplicates(this);
     }
     
 
-    public static void detectExistingBranches() {
+    public static Set<Branch> detectExistingBranches() {
         java.io.File srcDir = new java.io.File(".");
         java.io.FilenameFilter filter = (dir, name) -> name.startsWith("employee_") && name.endsWith(".ser");
         String[] files = srcDir.list(filter);
@@ -124,16 +129,63 @@ public class Branch implements Serializable{
                     } catch (NumberFormatException e) {
                         continue;
                     }
-                    
-                    Branch branch = new Branch(branchName, branchId, false);
+
+                    //search of the branch in the currently connected branches to copy the connected employee if any
+                   Branch branch = Branch.findBranchById(branchId,Servers.connectedBranches);
+
+                   System.out.println("FOUND BRANCH BY ID "+branchId+" in connected branches: "+ (branch != null) + " name: "+(branch != null ? branch.getConnectedEmployee().getFullName() : "NONE"));
+
+                    if (branch == null) {
+                        System.out.println("Creating new branch since null: Name=" + branchName + ", ID=" + branchId);
+                        branch = new Branch(branchName, branchId, false, null);
+                    }
+
+
                     existingBranches.add(branch);
-                    System.out.println("Detected existing branch: Name=" + branchName + ", ID=" + branchId);
+                    
                 }
             }
         }
+                                    return existingBranches;
     }
 
     public String getStockItemFilePath() {
         return "stockItems" + "_" + getName() + "_" + getId() + ".ser";
+    }
+
+
+
+    public static Branch findBranchById(int id, List<Branch> branches) {
+        for (Branch bra : branches) {
+            if (bra.getId() == id) {
+                return bra;
+            }
+        }
+        return null;
+    }
+
+
+    public static Branch findBranchById(int id, Set<Branch> branches) {
+        for (Branch bra : branches) {
+            if (bra.getId() == id) {
+                return bra;
+            }
+        }
+        return null;
+    }
+
+    public static void addBranchAndUpdateConnectionNoDuplicates(Branch branchToAdd) 
+    {
+        Branch existingBranch = findBranchById(branchToAdd.getId(), Servers.connectedBranches);
+        if (existingBranch != null) {
+            Servers.connectedBranches.remove(existingBranch);
+        }
+        Servers.connectedBranches.add(branchToAdd);
+
+        Branch existingBranch2 = findBranchById(branchToAdd.getId(), existingBranches);
+        if (existingBranch2 != null) {
+            existingBranches.remove(existingBranch2);
+        }
+        existingBranches.add(branchToAdd);
     }
 }
