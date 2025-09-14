@@ -73,6 +73,16 @@ public class EmployeeSerializer extends CustomSerializer {
         throw new IOException("Employee with ID " + employee_id + " not found.");
     }
 
+    public Employee loadEmployeeByEmail(String email) throws IOException, ClassNotFoundException {
+        List<Employee> employees = loadEmployeeList();
+        for (Employee emp : employees) {
+            if (emp.getEmail().equals(email)) {
+                return emp;
+            }
+        }
+        throw new IOException("Employee with email " + email + " not found.");
+    }
+
     public void saveEmployeeList(List<Employee> employees) throws IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(employeeDataFile))) {
             out.writeObject(employees);

@@ -68,6 +68,16 @@ public class CustomerSerializer extends CustomSerializer {
         }
     }
 
+    public Customer loadCustomerByEmail(String email) throws IOException, ClassNotFoundException {
+        List<Customer> customers = loadCustomerList();
+        for (Customer cust : customers) {
+            if (cust.getEmail().equalsIgnoreCase(email)) {
+                return cust;
+            }
+        }
+        throw new IOException("Customer with email " + email + " not found.");
+    }
+
     public void deleteCustomer(int customer_id) throws IOException, ClassNotFoundException {
        try {
            List<Customer> customers = loadCustomerList();

@@ -10,15 +10,25 @@ public class Branch implements Serializable{
     private boolean isConnected;
     private static Set<Branch> existingBranches = new java.util.HashSet<>();
 
+    private Employee connectedEmployee;
    // private static List<Socket> branchClients;
 
 
   
+   
 
     public Branch(String name, int id, boolean isConnected) {
         this.name = name;
         this.id = id;
         this.setConnectionStatus(isConnected);
+        existingBranches.add(this);
+    }
+
+    public Branch(String name, int id, boolean isConnected, Employee connectedEmployee) {
+        this.name = name;
+        this.id = id;
+        this.setConnectionStatus(isConnected);
+        this.connectedEmployee = connectedEmployee;
         existingBranches.add(this);
     }
 
@@ -29,7 +39,9 @@ public class Branch implements Serializable{
         existingBranches.add(this);
     }
 
-    private void setConnectionStatus(boolean isConnected) {
+    
+
+    public void setConnectionStatus(boolean isConnected) {
        if (isConnected) {
            System.out.println("Branch " + name + " is now connected.");
            Servers.connectedBranches.add(this);
@@ -75,6 +87,23 @@ public class Branch implements Serializable{
 
     public String getInventoryFilePath() {
         return "inventory" + "_" + getName() + "_" + getId() + ".ser";
+    }
+
+    public Employee getConnectedEmployee() {
+        if (isConnected()) {
+            return connectedEmployee;
+        } else {
+            System.out.println("No one is connected at Branch " + name + ".");
+            return null;
+        }
+    }
+
+    public void setConnectedEmployee(Employee employee) {
+        if (!isConnected()) {
+            System.out.println("Cannot set connected employee. Branch " + name + " is not connected.");
+            return;
+        }
+        this.connectedEmployee = employee;
     }
     
 

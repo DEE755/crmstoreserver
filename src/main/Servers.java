@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Branch;
+import model.Employee;
 import model.inventory.StockItem;
 import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
+import serialization.Logger;
 import serialization.StockItemSerializer;
 
 public class Servers {
@@ -17,6 +19,7 @@ public class Servers {
     public static List<Branch> connectedBranches = new ArrayList<Branch>();
 
     public static final ThreadLocal<Branch> currentBranch = new ThreadLocal<>();
+    private static Logger logger = Logger.getInstance();
 
     public static void main(String[] args) {
 
@@ -77,6 +80,8 @@ public class Servers {
                 this.branch = newlyConnectedBranch; //assign branch to this client handler
                 Servers.currentBranch.set(this.branch);
                 Servers.connectedBranches.add(newlyConnectedBranch);
+                logger.log(" Branch connected: " + newlyConnectedBranch.getName() + " at port " + clientSocket.getPort());
+
                 
                 //INITIALIZE SERIALIZERS FOR THE BRANCH
                 CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
@@ -97,7 +102,7 @@ public class Servers {
                     commands.handleCommand(line);
                 }
 
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Client " + clientSocket + " error: " + e);
             } finally {
                 if (outputStream != null) outputStream.close();

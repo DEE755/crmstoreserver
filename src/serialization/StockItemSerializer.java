@@ -68,6 +68,16 @@ public class StockItemSerializer extends CustomSerializer {
         }
     }
 
+    public StockItem loadStockItemById(int stockItemId) throws IOException, ClassNotFoundException {
+        List<StockItem> stockItems = loadStockItemList();
+        for (StockItem item : stockItems) {
+            if (item.getId() == stockItemId) {
+                return item;
+            }
+        }
+        throw new IOException("StockItem with ID " + stockItemId + " not found.");
+    }
+
     public void deleteStockItem(int stockItemId) throws IOException, ClassNotFoundException {
        try {
            List<StockItem> stockItems = loadStockItemList();
@@ -106,8 +116,7 @@ public void modifyStockItemQuantity(int stockItemId, int newQuantity) throws IOE
             break;
         }
     }
-    saveStockItemList(stockItems);
-    
+    saveStockItemList(stockItems); 
     
 }
 

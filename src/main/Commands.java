@@ -3,11 +3,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 import login.LoginHandler;
+import model.Branch;
 import model.Employee;
+import model.Sale;
 import model.customer.Customer;
 import model.inventory.StockItem;
 import serialization.CustomerSerializer;
 import serialization.EmployeeSerializer;
+import serialization.SalesSerializer;
 import serialization.StockItemSerializer;
 
 
@@ -15,6 +18,9 @@ public class Commands {
 private static EmployeeSerializer employeeSerializer = null;
 private static CustomerSerializer customerSerializer = null;
 private static StockItemSerializer stockItemSerializer = null;
+private static SalesSerializer salesSerializer = null;
+private static serialization.Logger logger;
+private Branch associatedBranch = Servers.currentBranch.get();
 
 
 private static LoginHandler loginHandler = null;
@@ -36,11 +42,17 @@ private Socket clientSocket;
             if (stockItemSerializer == null) {
                 stockItemSerializer = StockItemSerializer.getInstance();
             }
+            if (salesSerializer == null) {
+                salesSerializer = SalesSerializer.getInstance();
+            }
+            if (logger == null) {
+                logger = serialization.Logger.getInstance();
+            }
 
     }
 
 
-    void handleCommand(String commandWithArgs) throws IOException {
+    void handleCommand(String commandWithArgs) throws IOException, ClassNotFoundException {
 
         String[] parts = commandWithArgs.split(" ");
         String commandOnly = parts[0]; // Extract the first word
@@ -55,13 +67,15 @@ private Socket clientSocket;
                     String password = parts[2];
 
                     Employee employee = loginHandler.authenticate(username, password, employeeSerializer.loadEmployeeList());
+                    
                     if (employee != null) {
-         
                         System.out.println("Login successful! Welcome " + employee.getFirstName());
                         loginHandler.setLoggedIn(true);
+                        logger.log(employee.getBranch().getName() +": " +employee.getFullName() + " logged in.");
                         clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                         clientSocket.getOutputStream().flush();
                         employeeSerializer.sendEmployeeToClient(employee, clientSocket);
+                        Servers.currentBranch.get().setConnectedEmployee(employee);
 
                     } else {
                         System.out.println("Login failed. Please check your credentials.");
@@ -91,6 +105,8 @@ private Socket clientSocket;
                     // Add the employee with the serializer
                     employeeSerializer.saveEmployeeToLocalFile(newEmployee);
                     System.out.println("Employee added: " + newEmployee);
+
+                    logger.log("Added Employee: " + newEmployee.getFullName() + " (ID: " + newEmployee.getId() + ")" +" at branch "+associatedBranch.getName());
 
                     // Send a confirmation to the client
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
@@ -123,6 +139,7 @@ private Socket clientSocket;
                     employeeSerializer.deleteEmployee(employeeId);
                     System.out.println("Employee deleted: " + employeeId);
 
+                    logger.log(associatedBranch.getName() + " deleted Employee ID: " + employeeId);
                     // Send a confirmation to the client
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                     clientSocket.getOutputStream().flush();
@@ -165,6 +182,8 @@ private Socket clientSocket;
                     // Delete the customer with the serializer
                     customerSerializer.deleteCustomer(customerId);
                     System.out.println("Customer deleted: " + customerId);
+
+                    logger.log(associatedBranch.getName() + " deleted Customer ID: " + customerId);
 
                     // Send a confirmation to the client
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
@@ -221,6 +240,7 @@ private Socket clientSocket;
                     System.out.println("Customer added: " + customer);
 
                     // Send a confirmation to the client
+                    logger.log(associatedBranch.getName() + " added Customer: " + customer.getFullName() + " (ID: " + customer.getId() + ")" +" at branch "+associatedBranch.getName());
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                     clientSocket.getOutputStream().flush();
                 } catch (Exception ex) {
@@ -247,6 +267,7 @@ private Socket clientSocket;
                 stockItemSerializer.saveStockItem(newItem);
 
                 System.out.println("StockItem added: " + newItem);
+                logger.log(associatedBranch.getName() + " added StockItem: " + newItem.getName() + " (ID: " + newItem.getId() + ")");
                 clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                 clientSocket.getOutputStream().flush();
             } catch (Exception ex) {
@@ -264,6 +285,7 @@ private Socket clientSocket;
                 int itemId = Integer.parseInt(parts[2]);
                 stockItemSerializer.deleteStockItem(itemId);
                 System.out.println("StockItem deleted: " + itemId);
+                logger.log(associatedBranch.getName() + " deleted StockItem: " + itemId);
                 clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                 clientSocket.getOutputStream().flush();
             } catch (Exception ex) {
@@ -280,6 +302,7 @@ private Socket clientSocket;
                 stockItemSerializer.modifyStockItemQuantity(itemId, newQuantity);
                 clientSocket.getOutputStream().write(("SUCCESS\n").getBytes());
                 clientSocket.getOutputStream().flush();
+                logger.log( associatedBranch.getName() + " StockItem ID " + itemId + " quantity modified to " + newQuantity);
             } 
             catch (Exception ex) 
             {
@@ -316,6 +339,54 @@ private Socket clientSocket;
             }
 
             
+            break;
+        }
+
+
+        case "SubmitSale": {//SubmitSale Juan Carlos Chair David Cohen 39.998000000000005 2
+            if (parts.length != 8) {
+                System.err.println("Invalid SubmitSale command.");
+                break;
+            }
+
+            String customerEmail = parts[1];
+            int itemId = Integer.parseInt(parts[2]);
+            String sellerEmail = parts[3];
+            double salePrice = Double.parseDouble(parts[4]);
+            int quantitySold = Integer.parseInt(parts[5]);
+
+           Customer buyer = customerSerializer.loadCustomerByEmail(customerEmail);
+           StockItem itemSold = stockItemSerializer.loadStockItemById(itemId);
+           Employee seller = employeeSerializer.loadEmployeeByEmail(sellerEmail);
+           
+
+            
+            // Create Sale object
+           
+            Sale sale = new Sale(buyer, itemSold, seller, salePrice, quantitySold);
+
+            //salesSerializer.serializeSalesData(sale, "sales_data.ser");
+
+            logger.log( " Sale submitted: " + sale.toString()+ " at branch "+associatedBranch.getName());
+
+            stockItemSerializer.modifyStockItemQuantity(itemSold.getId(), itemSold.getQuantity() - quantitySold);
+            break;
+        }
+
+        case "Logout": {
+            try {
+                logger.log(associatedBranch.getName() +" " +associatedBranch.getConnectedEmployee().getFullName() + " logged out.");
+                System.out.println("Logging out...");
+                loginHandler.setLoggedIn(false);
+                Servers.currentBranch.get().setConnectionStatus(false);
+                Servers.connectedBranches.remove(Servers.currentBranch.get());
+                Servers.currentBranch.remove();
+                clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+                clientSocket.getOutputStream().flush();
+                clientSocket.close();
+            } catch (Exception e) {
+                System.err.println("Error during logout: " + e.getMessage());
+            }
             break;
         }
 
