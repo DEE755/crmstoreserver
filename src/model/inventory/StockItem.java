@@ -8,7 +8,7 @@ public class StockItem implements java.io.Serializable {
     private double price;
     private int id;
     private Category category;
-    
+    private String correspondingBranch;
 
     public StockItem(String name, int quantity, double price, Category category) {
         this.name = name;
@@ -19,12 +19,13 @@ public class StockItem implements java.io.Serializable {
     }
 
     //FOR EXISTING ITEMS
-    public StockItem(String name, int id, int quantity, double price, Category category) {
+    public StockItem(String name, int id, int quantity, double price, Category category, String correspondingBranch) {
         this.name = name;
         this.id = id;
         this.quantity = quantity;
         this.price = price;
         this.category = category;
+        this.correspondingBranch = correspondingBranch;
     }
 
     
@@ -63,6 +64,10 @@ public class StockItem implements java.io.Serializable {
 
     public Enum<Category> getCategory() {
         return category;
+    }
+
+    public String getCorrespondingBranch() {
+        return correspondingBranch;
     }
 
 }

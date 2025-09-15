@@ -17,14 +17,14 @@ public class StockItemSerializer extends CustomSerializer {
 
     private static final ThreadLocal<StockItemSerializer> instance =
         ThreadLocal.withInitial(() -> {
-            Branch branch = Servers.currentBranch.get();
+            Branch branch = Servers.currentHandler.get().getBranchClientHandler();
             return new StockItemSerializer(branch);
         });
 
     // Call this method to get the instance for the current thread and linking late init branch
     public static StockItemSerializer getInstance() {
     StockItemSerializer serializer = instance.get();
-    Branch currentBranch = Servers.currentBranch.get();
+    Branch currentBranch = Servers.currentHandler.get().getBranchClientHandler();
     //linking late init branch if not set yet
     if (serializer.branch == null && currentBranch != null) {
         serializer.branch = currentBranch;

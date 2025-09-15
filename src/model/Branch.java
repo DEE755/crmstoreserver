@@ -80,15 +80,19 @@ public class Branch implements Serializable{
 }
 
     public String getEmployeeFilePath() {
-        return "employee" + "_" + getName() + "_" + getId() + ".ser";
+        return util.Constants.EMPLOYEE_FILE;
+        //return "employee" + "_" + getName() + "_" + getId() + ".ser";
     }
 
     public String getCustomerFilePath() {
-        return "customer" + "_" + getName() + "_" + getId() + ".ser";
+            return util.Constants.CUSTOMER_DATA_FILE;
+        //return "customer" + "_" + getName() + "_" + getId() + ".ser";
     }
 
-    public String getInventoryFilePath() {
-        return "inventory" + "_" + getName() + "_" + getId() + ".ser";
+
+    public String getStockItemFilePath() {
+        return util.Constants.STOCK_ITEM_DATA_FILE;
+        //return "stockItems" + "_" + getName() + "_" + getId() + ".ser";
     }
 
     public Employee getConnectedEmployee() {
@@ -133,7 +137,7 @@ public class Branch implements Serializable{
                     //search of the branch in the currently connected branches to copy the connected employee if any
                    Branch branch = Branch.findBranchById(branchId,Servers.connectedBranches);
 
-                   System.out.println("FOUND BRANCH BY ID "+branchId+" in connected branches: "+ (branch != null) + " name: "+(branch != null ? branch.getConnectedEmployee().getFullName() : "NONE"));
+                   //System.out.println("FOUND BRANCH BY ID "+branchId+" in connected branches: "+ (branch != null) + " name: "+(branch != null ? branch.getConnectedEmployee().getFullName() : "NONE"));
 
                     if (branch == null) {
                         System.out.println("Creating new branch since null: Name=" + branchName + ", ID=" + branchId);
@@ -149,9 +153,7 @@ public class Branch implements Serializable{
                                     return existingBranches;
     }
 
-    public String getStockItemFilePath() {
-        return "stockItems" + "_" + getName() + "_" + getId() + ".ser";
-    }
+    
 
 
 

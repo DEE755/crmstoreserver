@@ -1,4 +1,7 @@
 package main;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
@@ -31,6 +34,7 @@ Set<Branch> existingBranches = null;
 
 private static LoginHandler loginHandler = null;
 private Socket clientSocket;
+
     public Commands(Socket clientSocket) {
         //one per instance
         loginHandler = new LoginHandler();
@@ -38,7 +42,7 @@ private Socket clientSocket;
 
         //Singleton instances of serializers
             if (employeeSerializer == null){
-                employeeSerializer = EmployeeSerializer.getInstance();
+                employeeSerializer = new EmployeeSerializer(Servers.currentHandler.get().getBranchClientHandler());
             }
 
             if (customerSerializer == null) {
@@ -62,12 +66,12 @@ private Socket clientSocket;
                 logger = serialization.Logger.getInstance();
             }
 
-            associatedBranch = Servers.currentBranch.get();
+            associatedBranch = Servers.currentHandler.get().getBranchClientHandler();
 
     }
 
 public void refreshAssociatedBranch(Branch branch) {
-    associatedBranch = Servers.currentBranch.get();
+    associatedBranch = Servers.currentHandler.get().getBranchClientHandler();
 }
 
     void handleCommand(String commandWithArgs) throws IOException, ClassNotFoundException {
@@ -96,7 +100,7 @@ public void refreshAssociatedBranch(Branch branch) {
                         clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                         clientSocket.getOutputStream().flush();
                         employeeSerializer.sendEmployeeToClient(employee, clientSocket);
-                        Servers.currentBranch.get().setConnectedEmployee(employee);
+                        Servers.currentHandler.get().getBranchClientHandler().setConnectedEmployee(employee);
 
                     } else {
                         System.out.println("Login failed. Please check your credentials.");
@@ -265,7 +269,7 @@ public void refreshAssociatedBranch(Branch branch) {
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                     clientSocket.getOutputStream().flush();
                 } catch (Exception ex) {
-                    System.err.println("Error adding employee: " + ex.getMessage());
+                    System.err.println("Error adding customer: " + ex.getMessage());
                 }
 
                 break;
@@ -274,15 +278,16 @@ public void refreshAssociatedBranch(Branch branch) {
 
         case "AddItem": {
             // Example: AddItem Chair 34 200.89 18607 MISC
-            if (parts.length == 6) {
+            if (parts.length == 7) {
             try {
                 String name = parts[1];
                 int quantity = Integer.parseInt(parts[2]);
                 double price = Double.parseDouble(parts[3]);
                 int itemId = Integer.parseInt(parts[4]);
                 StockItem.Category category = StockItem.Category.valueOf(parts[5].toUpperCase());
+                String correspondingBranch = parts[6];
 
-                StockItem newItem = new StockItem( name,itemId, quantity, price, category);
+                StockItem newItem = new StockItem( name,itemId, quantity, price, category, correspondingBranch);
 
                 // Save item using StockItemSerializer
                 stockItemSerializer.saveStockItem(newItem);
@@ -384,11 +389,7 @@ public void refreshAssociatedBranch(Branch branch) {
         }
 
 
-        case "SubmitSale": {//SubmitSale Juan Carlos Chair David Cohen 39.998000000000005 2
-            if (parts.length != 8) {
-                System.err.println("Invalid SubmitSale command.");
-                break;
-            }
+        case "SubmitSale": {
 
             String customerEmail = parts[1];
             int itemId = Integer.parseInt(parts[2]);
@@ -411,6 +412,10 @@ public void refreshAssociatedBranch(Branch branch) {
             logger.log( " Sale submitted: " + sale.toString()+ " at branch "+associatedBranch.getName());
 
             stockItemSerializer.modifyStockItemQuantity(itemSold.getId(), itemSold.getQuantity() - quantitySold);
+
+            clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+            clientSocket.getOutputStream().flush();
+           
             break;
         }
 
@@ -419,9 +424,9 @@ public void refreshAssociatedBranch(Branch branch) {
                 logger.log(associatedBranch.getName() +" " +associatedBranch.getConnectedEmployee().getFullName() + " logged out.");
                 System.out.println("Logging out...");
                 loginHandler.setLoggedIn(false);
-                Servers.currentBranch.get().setConnectionStatus(false);
-                Servers.connectedBranches.remove(Servers.currentBranch.get());
-                Servers.currentBranch.remove();
+                Servers.currentHandler.get().getBranchClientHandler().setConnectionStatus(false);
+                Servers.connectedBranches.remove(Servers.currentHandler.get().getBranchClientHandler());
+                
                 clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                 clientSocket.getOutputStream().flush();
                 clientSocket.close();
@@ -489,37 +494,98 @@ public void refreshAssociatedBranch(Branch branch) {
         break;
     }
 
+        case "ListChat": {
+        int branchId;
+        try {
+            branchId = Integer.parseInt(parts[1]);
+        } catch (Exception e) {
+            clientSocket.getOutputStream().write("ERROR Invalid branch ID\n".getBytes());
+            return;
+        }
+
+        File chatFile = new File("chat_sessions/" + branchId + ".txt");
+        if (!chatFile.exists() || chatFile.length() == 0) {
+            clientSocket.getOutputStream().write("EMPTY\n".getBytes());
+            return;
+        }
+
+        clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+        try (BufferedReader chatReader = new BufferedReader(new FileReader(chatFile))) {
+            String chatLine;
+            while ((chatLine = chatReader.readLine()) != null) {
+                clientSocket.getOutputStream().write((chatLine + "\n").getBytes());
+            }
+        } catch (IOException e) {
+            clientSocket.getOutputStream().write("ERROR Reading chat file\n".getBytes());
+            return;
+        }
+        clientSocket.getOutputStream().write("ENDLIST\n".getBytes());
+        break;
+    }
+
+
+    case "GetLogs": {
+    File logFile = new File("all_activity.log");
+    if (!logFile.exists() || logFile.length() == 0) {
+        clientSocket.getOutputStream().write("EMPTY\n".getBytes());
+        return;
+    }
+
+    clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
+    try (BufferedReader logReader = new BufferedReader(new FileReader(logFile))) {
+        String logLine;
+        while ((logLine = logReader.readLine()) != null) {
+            clientSocket.getOutputStream().write((logLine + "\n").getBytes());
+        }
+    } catch (IOException e) {
+        clientSocket.getOutputStream().write("ERROR Reading log file\n".getBytes());
+        return;
+    }
+    clientSocket.getOutputStream().write("ENDLIST\n".getBytes());
+    break;
+}
+
+
         default:
+        
             try {
                 clientSocket.getOutputStream().write("UNKNOWN COMMAND\n".getBytes());
                 clientSocket.getOutputStream().flush();
-            } catch (Exception e) {
+            } catch (IOException | NullPointerException e) {
                 System.err.println("Error sending unknown command response: " + e.getMessage());
             }
-       
-
-
+            
+            }
         }
-    }
+    
 
 
 
     private void sendMessageToParticipants(ChatSession chatSession) throws IOException {
         
        if (!chatSession.getDestinationBranch().isConnected()){
+        //if the destination branch is not connected, save the chat session to file for later retrieval
+        System.out.println("Destination branch "+chatSession.getDestinationBranch().getName()+" is not connected, saving chat session to file.");
            chatSessionSerializer.createBranchChatTextFileIfNeededAndWrite(chatSession);
        }
 
     else {
+         boolean found = false;
         //send the message to the destination branch client handler if connected
         for (ClientHandler handler : Servers.clientHandlers) {
-            if (handler.branch != null && handler.branch.getId() == chatSession.getDestinationBranch().getId()) {
+           
+            System.err.println("Checking handler for branch ID: " + (handler.branchClientHandler != null ? handler.branchClientHandler.getId() : "null"));
+            if (handler.branchClientHandler != null && handler.branchClientHandler.getId() == chatSession.getDestinationBranch().getId()) {
                 handler.clientSocket.getOutputStream().write(("ChatMessage " + chatSession.getSourceBranchEmployee().getFullName().replace(" ", "-") + "@" + chatSession.getSourceBranch().getName() + " " + chatSession.getNextMessage() + "\n").getBytes());
                 handler.clientSocket.getOutputStream().flush();
+                System.err.println("Message sent to branch ID: " + chatSession.getDestinationBranch().getId() + " Message: " + chatSession.getNextMessage());
+                found = true;
                 break;
             }
         }
-
+        if (!found) {
+            throw new IOException("No client handler found for destination branch ID: " + chatSession.getDestinationBranch().getId());
+        }
     }
 }
 
@@ -528,6 +594,7 @@ public void refreshAssociatedBranch(Branch branch) {
     {
         Set<Branch> existingBranches = Branch.detectExistingBranches();
         String branchesText = util.TypeConverter.branchSetToText(existingBranches);
+        
         String response = "SUCCESS\n" + branchesText + "ENDLIST\n";
         clientSocket.getOutputStream().write(response.getBytes());
         

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import main.Servers;
+import model.Branch;
 import model.Employee;
 import model.Employee.Role;
 import model.customer.Customer;
@@ -14,11 +15,8 @@ import serialization.EmployeeSerializer;
 
 public class Utility {
 
-private static CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
-private static EmployeeSerializer employeeSerializer = EmployeeSerializer.getInstance();
-
     public static int calculateLastId() {
-
+        CustomerSerializer customerSerializer = CustomerSerializer.getInstance(); // Get per-thread instance
         try {
             List<Customer> customers = customerSerializer.loadCustomerList();
             if (!customers.isEmpty()) {
@@ -27,18 +25,23 @@ private static EmployeeSerializer employeeSerializer = EmployeeSerializer.getIns
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("No customer data found. Starting IDs from 1.");
         }
-
         return 1; 
     }
 
+    public static void createEmployeeFileIfNotExists() {
+        EmployeeSerializer employeeSerializer = new EmployeeSerializer(Servers.currentHandler.get().getBranchClientHandler()); // Get per-thread instance
+        Branch branch = Servers.currentHandler.get().getBranchClientHandler();
+        String path = branch.getEmployeeFilePath();
+        if (path == null) {
+            path = util.Constants.EMPLOYEE_FILE;
+        }
 
-     public static void createEmployeeFileIfNotExists() {
-        File employeeFile = new File(Servers.currentBranch.get().getEmployeeFilePath());
+        File employeeFile = new File(path);
         if (!employeeFile.exists()) {
             try {
-                employeeSerializer.saveEmployee( new Employee(0, "administrator", "administrator", "admin@admin.com", "admin", "admin", "00000000", Role.ADMIN, Servers.currentBranch.get())
+                employeeSerializer.saveEmployee(
+                    new Employee(0, "administrator", "administrator", "admin@admin.com", "admin", "admin", "00000000", Role.ADMIN, new Branch("ALL_BRANCHES"))
                 );
-
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Error saving employee: " + e.getMessage());
             }

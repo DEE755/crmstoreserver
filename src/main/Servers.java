@@ -18,7 +18,7 @@ public class Servers {
     public static Set<Branch> connectedBranches = new HashSet<>();
     public static List<ClientHandler> clientHandlers = new ArrayList<>();
 
-    public static final ThreadLocal<Branch> currentBranch = new ThreadLocal<>();
+    public static final ThreadLocal<ClientHandler> currentHandler = new ThreadLocal<>();
     private static Logger logger = Logger.getInstance();
 
     public static void main(String[] args) {
@@ -50,21 +50,31 @@ public class Servers {
     }
 
 
-    static class ClientHandler implements Runnable {
+    public static class ClientHandler implements Runnable {
         final Socket clientSocket;
-        Branch branch;
+        Branch branchClientHandler;
+
+        public Branch getBranchClientHandler() {
+            return branchClientHandler;
+        }
+
+        public void setBranchClientHandler(Branch branchClientHandler) {
+            this.branchClientHandler = branchClientHandler;
+        }
 
         ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
             clientHandlers.add(this);
+            
         }
 
         @Override
         public void run() {
+            Servers.currentHandler.set(this);
             DataInputStream inputStream = null;
             PrintStream outputStream = null;
             String line = "";
-            Commands commands = new Commands(clientSocket);
+            
 
             try {
                 //initialize input and output streams for the specific client
@@ -78,17 +88,22 @@ public class Servers {
 
                 String[] parts= line.split(" ");
                 Branch newlyConnectedBranch = new Branch(parts[0], Integer.parseInt(parts[1]), true);
-                this.branch = newlyConnectedBranch; //assign branch to this client handler
-                Servers.currentBranch.set(this.branch);
+                this.branchClientHandler = newlyConnectedBranch;
+                
                 System.out.println("Branch created and added: " + newlyConnectedBranch.getName() + " with ID " + newlyConnectedBranch.getId() + " connected: " + newlyConnectedBranch.isConnected());
+                //assign branch to this client handler
+                Servers.currentHandler.remove();
+                Servers.currentHandler.set(this); // Set the current handler
+                
                 Branch.addBranchAndUpdateConnectionNoDuplicates(newlyConnectedBranch);
+                Commands commands = new Commands(clientSocket);
                 commands.refreshAssociatedBranch(newlyConnectedBranch);
                 logger.log(" Branch connected: " + newlyConnectedBranch.getName() + " at port " + clientSocket.getPort());
 
                 
                 //INITIALIZE SERIALIZERS FOR THE BRANCH
                 CustomerSerializer customerSerializer = CustomerSerializer.getInstance();
-                EmployeeSerializer employeeSerializer = EmployeeSerializer.getInstance();
+                EmployeeSerializer employeeSerializer = new EmployeeSerializer(newlyConnectedBranch);
                 StockItemSerializer stockItemSerializer = StockItemSerializer.getInstance();
 
                 
@@ -111,7 +126,7 @@ public class Servers {
                 if (outputStream != null) outputStream.close();
                 if (inputStream != null) try { inputStream.close(); } catch (IOException ignored) {}
                 if (clientSocket != null) try { clientSocket.close(); } catch (IOException ignored) {}
-                Servers.currentBranch.remove();
+                Servers.currentHandler.remove();
             }
         }
 

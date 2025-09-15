@@ -113,7 +113,7 @@ public static Customer stringToCustomer(String customerInfoString) {
 
 public static StockItem stringToStockItem(String itemString) {
     String[] parts = itemString.split(" ");
-    if (parts.length != 1 && parts.length != 5) {
+    if (parts.length != 1 && parts.length != 6) {
         throw new IllegalArgumentException("SERVERstringToStockItem Invalid item string: " + itemString);
     }
     String name = parts[0];
@@ -121,8 +121,9 @@ public static StockItem stringToStockItem(String itemString) {
     double price = Double.parseDouble(parts[2]);
     int id = Integer.parseInt(parts[3]);
     StockItem.Category category = StockItem.Category.valueOf(parts[4]);
+    String correspondingBranchID = parts[5];
 
-    return new StockItem(name, id, quantity, price, category);
+    return new StockItem(name, id, quantity, price, category, correspondingBranchID);
 }
 
 
@@ -134,7 +135,8 @@ public static String stockItemListToText(List<StockItem> stockItems) {
           .append(item.getQuantity()).append(" ")
           .append(item.getPrice()).append(" ")
           .append(item.getId()).append(" ")
-          .append(item.getCategory().toString()).append("\n");
+          .append(item.getCategory().toString()).append(" ")
+          .append(item.getCorrespondingBranch()).append("\n");
     }
     return sb.toString();
 }
@@ -146,8 +148,8 @@ public static String branchSetToText(Set<Branch> branches) {
     for (Branch branch : branches) {
         sb.append(branch.getName()).append(" ")
           .append(branch.getId()).append(" ")
-          .append(branch.isConnected() ? "Connected" : "Disconnected").append(" ")
-          .append(branch.isConnected()? branch.getConnectedEmployee().getFullName() : "None")
+          .append(branch.isConnected() ? "true" : "false").append(" ")
+          .append(branch.isConnected()? branch.getConnectedEmployee().getFullName() : "None None")
           .append("\n");
     }
     return sb.toString();

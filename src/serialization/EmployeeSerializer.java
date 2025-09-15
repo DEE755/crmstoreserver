@@ -18,31 +18,31 @@ public class EmployeeSerializer extends CustomSerializer {
 
     private static final ThreadLocal<EmployeeSerializer> instance =
         ThreadLocal.withInitial(() -> {
-            Branch branch = Servers.currentBranch.get();
+            Branch branch = Servers.currentHandler.get().getBranchClientHandler();
             return new EmployeeSerializer(branch);
         });
 
       // Call this method to get the instance for the current thread and linking late init branch
     public static EmployeeSerializer getInstance() {
     EmployeeSerializer serializer = instance.get();
-    Branch currentBranch = Servers.currentBranch.get();
+    Branch currentBranch = Servers.currentHandler.get().getBranchClientHandler();
     //linking late init branch if not set yet
-    if (serializer.branch == null && currentBranch != null) {
+   
         serializer.branch = currentBranch;
         serializer.setFilesPaths();
-    }
+    
     return serializer;
 }
 
 //According to present code, when calling this constructor branch is always null. Udpate it in getInstance after getting currentBranch from Servers
-    private EmployeeSerializer(Branch branch) {
+    public EmployeeSerializer(Branch branch) {
         this.branch = branch;
-        setFilesPaths();
+        this.employeeDataFile = Servers.currentHandler.get().getBranchClientHandler().getEmployeeFilePath();
     }
 
     private void setFilesPaths() {
         if (branch != null) {
-            this.employeeDataFile = branch.getEmployeeFilePath();
+            this.employeeDataFile = Servers.currentHandler.get().getBranchClientHandler().getEmployeeFilePath();
             System.out.println("Current branch in EmployeeSerializer: " + branch.getName());
         } else {
             this.employeeDataFile = util.Constants.EMPLOYEE_FILE;
