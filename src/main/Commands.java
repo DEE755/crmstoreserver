@@ -96,7 +96,7 @@ public void refreshAssociatedBranch(Branch branch) {
                     if (employee != null) {
                         System.out.println("Login successful! Welcome " + employee.getFirstName());
                         loginHandler.setLoggedIn(true);
-                        logger.log(employee.getBranch().getName() +": " +employee.getFullName() + " logged in.");
+                        logger.log("CONNECTION: " + employee.getBranch().getName() + ": " + employee.getFullName() + " logged in.");
                         clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                         clientSocket.getOutputStream().flush();
                         employeeSerializer.sendEmployeeToClient(employee, clientSocket);
@@ -131,7 +131,7 @@ public void refreshAssociatedBranch(Branch branch) {
                     employeeSerializer.saveEmployeeToLocalFile(newEmployee);
                     System.out.println("Employee added: " + newEmployee);
 
-                    logger.log("Added Employee: " + newEmployee.getFullName() + " (ID: " + newEmployee.getId() + ")" +" at branch "+associatedBranch.getName());
+                    logger.log("ADDED: "+ "EMPLOYEE" + newEmployee.getFullName() + " (ID: " + newEmployee.getId() + ")" +" at branch "+associatedBranch.getName());
 
                     // Send a confirmation to the client
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
@@ -164,7 +164,7 @@ public void refreshAssociatedBranch(Branch branch) {
                     employeeSerializer.deleteEmployee(employeeId);
                     System.out.println("Employee deleted: " + employeeId);
 
-                    logger.log(associatedBranch.getName() + " deleted Employee ID: " + employeeId);
+                    logger.log("ADDED: " +associatedBranch.getName() + " deleted Employee ID: " + employeeId);
                     // Send a confirmation to the client
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                     clientSocket.getOutputStream().flush();
@@ -208,7 +208,7 @@ public void refreshAssociatedBranch(Branch branch) {
                     customerSerializer.deleteCustomer(customerId);
                     System.out.println("Customer deleted: " + customerId);
 
-                    logger.log(associatedBranch.getName() + " deleted Customer ID: " + customerId);
+                    logger.log("ADDED: " + associatedBranch.getName() + " deleted Customer ID: " + customerId);
 
                     // Send a confirmation to the client
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
@@ -265,7 +265,7 @@ public void refreshAssociatedBranch(Branch branch) {
                     System.out.println("Customer added: " + customer);
 
                     // Send a confirmation to the client
-                    logger.log(associatedBranch.getName() + " added Customer: " + customer.getFullName() + " (ID: " + customer.getId() + ")" +" at branch "+associatedBranch.getName());
+                    logger.log("ADDED:" + associatedBranch.getName() + " added Customer: " + customer.getFullName() + " (ID: " + customer.getId() + ")" +" at branch "+associatedBranch.getName());
                     clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                     clientSocket.getOutputStream().flush();
                 } catch (Exception ex) {
@@ -293,7 +293,7 @@ public void refreshAssociatedBranch(Branch branch) {
                 stockItemSerializer.saveStockItem(newItem);
 
                 System.out.println("StockItem added: " + newItem);
-                logger.log(associatedBranch.getName() + " added StockItem: " + newItem.getName() + " (ID: " + newItem.getId() + ")");
+                logger.log("ADDED:" + associatedBranch.getName() + " added StockItem: " + newItem.getName() + " (ID: " + newItem.getId() + ")");
                 clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                 clientSocket.getOutputStream().flush();
             } catch (Exception ex) {
@@ -311,7 +311,7 @@ public void refreshAssociatedBranch(Branch branch) {
                 int itemId = Integer.parseInt(parts[2]);
                 stockItemSerializer.deleteStockItem(itemId);
                 System.out.println("StockItem deleted: " + itemId);
-                logger.log(associatedBranch.getName() + " deleted StockItem: " + itemId);
+                logger.log("ADDED:" + associatedBranch.getName() + " deleted StockItem: " + itemId);
                 clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
                 clientSocket.getOutputStream().flush();
             } catch (Exception ex) {
@@ -328,7 +328,7 @@ public void refreshAssociatedBranch(Branch branch) {
                 stockItemSerializer.modifyStockItemQuantity(itemId, newQuantity);
                 clientSocket.getOutputStream().write(("SUCCESS\n").getBytes());
                 clientSocket.getOutputStream().flush();
-                logger.log( associatedBranch.getName() + " StockItem ID " + itemId + " quantity modified to " + newQuantity);
+                logger.log("STOCKS:" +  associatedBranch.getName() + " StockItem ID " + itemId + " quantity modified to " + newQuantity);
             } 
             catch (Exception ex) 
             {
@@ -379,7 +379,7 @@ public void refreshAssociatedBranch(Branch branch) {
 
             StockItem itemToBuy = stockItemSerializer.loadStockItemById(itemId);
             itemToBuy.setQuantity(itemToBuy.getQuantity() + quantity);
-            logger.log( associatedBranch.getName() + " Bought " + quantity + " of Item ID " + itemId + " new quantity: " + itemToBuy.getQuantity());
+            logger.log("STOCKS:" + "BUYING" + associatedBranch.getName() + " Bought " + quantity + " of Item ID " + itemId + " new quantity: " + itemToBuy.getQuantity());
             // Update stock item quantity
             stockItemSerializer.modifyStockItemQuantity(itemId, itemToBuy.getQuantity());
             clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
@@ -409,7 +409,7 @@ public void refreshAssociatedBranch(Branch branch) {
 
             //salesSerializer.serializeSalesData(sale, "sales_data.ser");
 
-            logger.log( " Sale submitted: " + sale.toString()+ " at branch "+associatedBranch.getName());
+            logger.log("SALE:" + " Sale submitted: " + sale.toString()+ " at branch "+associatedBranch.getName());
 
             stockItemSerializer.modifyStockItemQuantity(itemSold.getId(), itemSold.getQuantity() - quantitySold);
 
@@ -421,7 +421,7 @@ public void refreshAssociatedBranch(Branch branch) {
 
         case "Logout": {
             try {
-                logger.log(associatedBranch.getName() +" " +associatedBranch.getConnectedEmployee().getFullName() + " logged out.");
+                logger.log("CONNECTION" + associatedBranch.getName() +" " +associatedBranch.getConnectedEmployee().getFullName() + " logged out.");
                 System.out.println("Logging out...");
                 loginHandler.setLoggedIn(false);
                 Servers.currentHandler.get().getBranchClientHandler().setConnectionStatus(false);
@@ -464,8 +464,13 @@ public void refreshAssociatedBranch(Branch branch) {
                 break;
             }
              if (existingBranches == null || existingBranches.isEmpty()) {
-                System.err.println("No existing branches found.");
-                break;
+                existingBranches = updateAndListAllBranches();
+                if (existingBranches.isEmpty()) {
+                    clientSocket.getOutputStream().write("EMPTY\n".getBytes());
+                    clientSocket.getOutputStream().flush();
+                    System.err.println("No existing branches found.");
+                    break;
+                }
             }
 
             
@@ -480,7 +485,7 @@ public void refreshAssociatedBranch(Branch branch) {
             clientSocket.getOutputStream().flush();
 
            sendMessageToParticipants(chatSession);
-            logger.log( associatedBranch.getConnectedEmployee().getFullName().replace(" ", "-")+"@"+associatedBranch.getName() + " started chat session with " + targetBranch.getName());
+            logger.log("MESSAGE:" + associatedBranch.getConnectedEmployee().getFullName().replace(" ", "-") + "@" + associatedBranch.getName() + " sent to " + targetBranch.getName() + ": " + message);
             clientSocket.getOutputStream().write("SUCCESS\n".getBytes());
 
 
@@ -523,6 +528,7 @@ public void refreshAssociatedBranch(Branch branch) {
         break;
     }
 
+   
 
     case "GetLogs": {
     File logFile = new File("all_activity.log");
@@ -544,6 +550,8 @@ public void refreshAssociatedBranch(Branch branch) {
     clientSocket.getOutputStream().write("ENDLIST\n".getBytes());
     break;
 }
+
+
 
 
         default:

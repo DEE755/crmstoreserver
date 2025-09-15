@@ -27,10 +27,10 @@ public class ChatSession {
     }
 
     public void addMessage(String message) {
-        Employee sender = sourceBranch.getConnectedEmployee();
+        //Employee sender = sourceBranch.getConnectedEmployee(); //already included in message
         
-        String addedInfoMessage = "[" + java.time.LocalDateTime.now() +" - Sent By: " + sender.getFullName() + "] " + message;
-        messageQueue.offer(addedInfoMessage);
+        //String addedInfoMessage = "[" + java.time.LocalDateTime.now() +" - Sent By: " + sender.getFullName() + "] " + message;
+        messageQueue.offer(message);
 
     }
 
